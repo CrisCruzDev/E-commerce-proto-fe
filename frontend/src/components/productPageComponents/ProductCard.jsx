@@ -9,10 +9,16 @@ const ProductCard = ({ product: initialProductData }) => {
   const { setUpdateProduct } = useProductStore()
   const addToCartMutation = useAddToCart()
 
+  const hasFullData =
+    initialProductData?.price &&
+    initialProductData?.stock !== undefined &&
+    initialProductData?.image
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['getProductById', initialProductData._id],
     queryFn: () => getProductById(initialProductData._id),
-    initialData: initialProductData,
+    enabled: !hasFullData && !!initialProductData?._id, // run only if we need more info
+    initialData: hasFullData ? initialProductData : undefined,
     staleTime: 5 * 60 * 1000,
   })
 
@@ -27,6 +33,7 @@ const ProductCard = ({ product: initialProductData }) => {
   if (isLoading) return <div>Loading products...</div>
   if (isError)
     return <div>Error: {error.response?.data?.message || error.message}</div>
+  if (!data) return null
 
   const currentStock = data.stock
   const isOutOfStock = currentStock === 0

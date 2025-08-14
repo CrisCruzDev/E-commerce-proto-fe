@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const ProductInfoStep = ({
   formData,
@@ -10,15 +10,27 @@ export const ProductInfoStep = ({
   const [imageFile, setImageFile] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
 
+  const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    if (formData.image && typeof formData.image === 'string') {
+      setImageFile(formData.image)
+    }
+  }, [formData.image])
+
+  const handleFile = (file) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImageFile(reader.result)
+      onFormChange({ image: reader.result })
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
-      setImageFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        onFormChange({ image: reader.result })
-      }
-      reader.readAsDataURL(file)
+      handleFile(file)
     } else {
       // --- FIX: If drop is invalid/cleared, ensure imageUrl is an empty string ---
       setImageFile(null)
@@ -28,31 +40,34 @@ export const ProductInfoStep = ({
 
   const handleDragOver = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragging(true)
   }
 
   const handleDragLeave = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragging(false)
   }
 
   const handleDrop = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragging(false)
     const file = e.dataTransfer.files[0]
     if (file) {
-      setImageFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        onFormChange({ image: reader.result, imageFile: file })
-      }
-      reader.readAsDataURL(file)
+      handleFile(file)
     }
   }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     onFormChange({ [name]: value })
+  }
+
+  const clearImage = () => {
+    setImageFile(null)
+    onFormChange({ image: '' })
   }
 
   return (
@@ -65,8 +80,9 @@ export const ProductInfoStep = ({
         >
           Image
         </label>
-        <div
-          className={`relative w-full sm:w-3/4 aspect-video border-2 border-dashed flex items-center justify-center cursor-pointer hover:bg-gray-100 duration-100
+        <div className='flex items-center justify-center'>
+          <div
+            className={`relative w-full sm:w-3/4 aspect-video border-2 border-dashed flex items-center justify-center cursor-pointer hover:bg-gray-100 duration-100
                   ${
                     isDragging
                       ? 'border-purple-500 bg-purple-50'
@@ -76,44 +92,46 @@ export const ProductInfoStep = ({
                     validationErrors.image ? 'border-red-300 bg-red-100/30' : ''
                   }
                   `}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => document.getElementById('file-input').click()}
-        >
-          <input
-            id='file-input'
-            type='file'
-            className='hidden'
-            onChange={handleFileChange}
-            accept='image/*'
-          />
-          {formData.image ? (
-            <img
-              src={formData.image}
-              alt='Product Preview'
-              className='max-h-full max-w-full object-contain p-4'
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-input').click()}
+          >
+            <input
+              id='file-input'
+              type='file'
+              className='hidden'
+              onChange={handleFileChange}
+              accept='image/*'
+              ref={fileInputRef}
             />
-          ) : (
-            <div className='text-gray-500 text-center'>
-              <p className='text-4xl text-gray-400'>+</p>
-              <p className='mt-2 text-sm'>
-                Drag & drop an image here, or click to select
-              </p>
-            </div>
-          )}
-          {formData.image && (
-            <button
-              type='button'
-              onClick={(e) => {
-                e.stopPropagation()
-                clearImage()
-              }}
-              className='absolute top-2 right-2 p-1 bg-red-500 text-white hover:bg-red-600 text-xs cursor-pointer'
-            >
-              &times;
-            </button>
-          )}
+            {formData.image ? (
+              <img
+                src={formData.image}
+                alt='Product Preview'
+                className='max-h-full max-w-full object-contain p-4'
+              />
+            ) : (
+              <div className='text-gray-500 text-center'>
+                <p className='text-4xl text-gray-400'>+</p>
+                <p className='mt-2 text-sm'>
+                  Drag & drop an image here, or click to select
+                </p>
+              </div>
+            )}
+            {formData.image && (
+              <button
+                type='button'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  clearImage()
+                }}
+                className='absolute top-2 right-2 p-1 bg-red-500 text-white hover:bg-red-600 text-xs cursor-pointer'
+              >
+                &times;
+              </button>
+            )}
+          </div>
         </div>
         {validationErrors.image && ( // Error message for image
           <p className='mt-1 text-sm text-red-600'>{validationErrors.image}</p>

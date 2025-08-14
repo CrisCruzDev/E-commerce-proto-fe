@@ -54,7 +54,7 @@ const ProductDetails = () => {
         <div className='flex flex-col md:flex-row gap-8 md:gap-16'>
           {/* Left Side: Image */}
           <div className='flex-1'>
-            <div className='relative w-full h-120 sm:h-96 bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
+            <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
               <img
                 src={product?.image}
                 alt='Product'
@@ -205,7 +205,7 @@ const ProductDetails = () => {
       <Toaster position='bottom-right' reverseOrder={false} />
       {isExpanded && (
         <div
-          className='fixed inset-0 bg-black/20 backdrop-blur-[5px] z-50 flex items-center justify-center p-40'
+          className='fixed inset-0 bg-black/20 backdrop-blur-[5px] z-50 flex items-center justify-center p-20'
           onClick={() => setIsExpanded(false)}
         >
           <img

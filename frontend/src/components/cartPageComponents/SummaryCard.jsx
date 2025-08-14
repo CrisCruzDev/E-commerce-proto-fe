@@ -9,7 +9,7 @@ export const SummaryCard = ({ item }) => {
   const total = subtotal + shipping
 
   return (
-    <div className='sticky '>
+    <div className='sticky flex flex-col justify-between gap-12'>
       <h2 className='text-2xl font-semibold mb-4'>Order Summary</h2>
       <div className='border-t border-gray-300 pt-4'>
         <div className='flex justify-between mb-4'>
