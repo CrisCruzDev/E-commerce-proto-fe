@@ -1,63 +1,58 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-export const useProductStore = create((set) => {
-  return {
-    products: [],
-    setProducts: (products) => set({ products }),
-    createProduct: async (newProduct) => {
-      if (!newProduct.name || !newProduct.price || !newProduct.image) {
-        return { success: false, message: 'Please fill in all fields' }
-      }
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newProduct),
-      })
+export const useProductStore = create(
+  persist(
+    (set) => ({
+      products: [],
+      product: null,
+      stock: 0,
 
-      const data = await res.json()
-      set((state) => ({ products: [...state.products, data.data] }))
-      return { success: 'true', message: 'Product created' }
-    },
-
-    fetchProducts: async () => {
-      const res = await fetch('/api/products')
-      const data = await res.json()
-      set({ products: data.data })
-    },
-    deleteProduct: async (pid) => {
-      const res = await fetch(`/api/products/${pid}`, {
-        method: 'DELETE',
-      })
-      const data = await res.json()
-      if (!data.success) return { success: false, message: data.message }
-
-      set((state) => ({
-        products: state.products.filter((product) => product._id !== pid),
-      }))
-      return { success: true, message: data.message }
-    },
-    updateProduct: async (pid, updatedProduct) => {
-      const res = await fetch(`/api/products/${pid}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedProduct),
-      })
-      const data = await res.json()
-      if (!data.success)
-        return {
-          success: false,
-          message: data.message,
+      setUpdateProduct: (product) => {
+        if (product && typeof product === 'object') {
+          const sanitizedProduct = sanitizeProduct(product)
+          set({ product: sanitizedProduct })
+        } else {
+          console.warn('Invalid product passed to setUpdateProduct:', product)
         }
-      set((state) => ({
-        products: state.products.map((product) =>
-          product._id === pid ? data.data : product,
-        ),
-      }))
-      return { success: true, message: data.message }
+      },
+      setStock: (id, newStock) => {
+        set((state) => ({
+          stock: {
+            ...state.stock,
+            [id]: newStock,
+          },
+        }))
+      },
+    }),
+    {
+      name: 'product-store',
     },
+  ),
+)
+
+// 👇 Sanitize function to exclude large fields
+function sanitizeProduct(product) {
+  const MAX_IMAGE_LENGTH = 1000
+  const MAX_DESCRIPTION_LENGTH = 1000
+
+  const {
+    image,
+    description,
+    reviews, // optionally exclude or shorten arrays
+    ...rest
+  } = product
+
+  return {
+    ...rest,
+    image:
+      typeof image === 'string' && image.length <= MAX_IMAGE_LENGTH
+        ? image
+        : 'Image file too large*',
+    description:
+      typeof description === 'string'
+        ? description.slice(0, MAX_DESCRIPTION_LENGTH)
+        : '',
+    // optionally include reviews if small: reviews?.slice?.(0, 3),
   }
-})
+}
