@@ -5,13 +5,42 @@ import CartCard from '../components/cartPageComponents/CartCard'
 import { SummaryCard } from '../components/cartPageComponents/SummaryCard'
 
 const CartPage = () => {
-  const { data: cartData } = useQuery({
+  const {
+    data: cartData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['cart'],
     queryFn: () => getCart(),
     refetchOnWindowFocus: true,
   })
 
   console.log('cart: ', cartData)
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <p className='text-lg text-gray-600'>Loading cart...</p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className='flex flex-col items-center justify-center h-screen'>
+        <p className='text-lg text-red-500'>
+          Failed to load cart: {error.message}
+        </p>
+        <Link
+          to='/'
+          className='px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 duration-150'
+        >
+          Go Back
+        </Link>
+      </div>
+    )
+  }
 
   const cartItems = (cartData?.items || []).filter(
     (item) => item.product !== null,

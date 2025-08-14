@@ -6,6 +6,14 @@ import { useCartStore } from '../../store/cart'
 import toast from 'react-hot-toast'
 
 const CartCard = ({ item }) => {
+  if (!item || !item.product) {
+    return (
+      <div className='flex items-center justify-center p-6 border rounded-lg bg-gray-50'>
+        <p className='text-gray-500'>Loading item...</p>
+      </div>
+    )
+  }
+
   const queryClient = useQueryClient()
   const { increment, decrement } = useCartStore()
   const navigate = useNavigate()
@@ -22,6 +30,10 @@ const CartCard = ({ item }) => {
     queryFn: () => getProductById(item.product._id),
     staleTime: 60 * 1000,
   })
+
+  if (!productData) {
+    return <div>Loading...</div>
+  }
 
   console.log('productData:', productData)
 
