@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { getProductById, addProductToCart } from '../../api/productApi'
+import { getProductById } from '../../api/productApi'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { useProductStore } from '../../store/product'
@@ -15,11 +15,10 @@ const ProductCard = ({ product: initialProductData }) => {
     initialProductData?.image
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['getProductById', initialProductData._id],
+    queryKey: ['getProductById', initialProductData?._id],
     queryFn: () => getProductById(initialProductData._id),
-    enabled: !hasFullData && !!initialProductData?._id, // run only if we need more info
     initialData: hasFullData ? initialProductData : undefined,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   })
 
   console.log('product: ', data)
@@ -30,10 +29,9 @@ const ProductCard = ({ product: initialProductData }) => {
     }
   }, [data])
 
-  if (isLoading) return <div>Loading products...</div>
+  if (isLoading || !data) return <div>Loading products...</div>
   if (isError)
     return <div>Error: {error.response?.data?.message || error.message}</div>
-  if (!data) return null
 
   const currentStock = data.stock
   const isOutOfStock = currentStock === 0
@@ -42,7 +40,7 @@ const ProductCard = ({ product: initialProductData }) => {
     <div>
       <Link
         className='text-[10px] transition-colors cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
-        to={`/edit/${data._id}`}
+        to={`/edit/${data?._id}`}
       >
         <p>Edit &rarr;</p>
       </Link>
@@ -51,15 +49,15 @@ const ProductCard = ({ product: initialProductData }) => {
           isOutOfStock ? 'opacity-30 pointer-events-auto' : ''
         }`}
       >
-        <Link to={`/product/${data._id}`} state={{ data }}>
+        <Link to={`/product/${data?._id}`} state={{ data }}>
           <div
             className={`flex relative items-center justify-center bg-gray-100/40 overflow-hidden w-full h-70 sm:h-70 group-hover:shadow-sm group-hover:scale-101 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out ${
-              !data.image ? 'bg-neutral-100' : ''
+              !data?.image ? 'bg-neutral-100' : ''
             }`}
           >
             <img
-              src={data.image}
-              alt={data.name}
+              src={data?.image}
+              alt={data?.name}
               className='object-contain w-full h-full '
             />
             {/* SOLD OUT overlay */}
@@ -85,11 +83,11 @@ const ProductCard = ({ product: initialProductData }) => {
         </Link>
 
         <div className='flex flex-col justify-between items-start gap-2'>
-          <p className='text-md font-semibold text-black'>${data.price}</p>
+          <p className='text-md font-semibold text-black'>${data?.price}</p>
           <button
             className='bg-black/92 text-white h-6 hover:bg-black transition-colors duration-200
                      disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
-            onClick={() => addToCartMutation.mutate({ id: data._id, qty: 1 })}
+            onClick={() => addToCartMutation.mutate({ id: data?._id, qty: 1 })}
             disabled={isOutOfStock || addToCartMutation.isLoading}
           >
             <div className='flex px-2 items-center !space-x-1'>

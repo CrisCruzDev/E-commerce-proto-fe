@@ -1,10 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { getCart } from '../api/cartApi'
 import CartCard from '../components/cartPageComponents/CartCard'
 import { SummaryCard } from '../components/cartPageComponents/SummaryCard'
+import { getProductById } from '../api/productApi'
 
 const CartPage = () => {
+  const queryClient = useQueryClient()
+
   const {
     data: cartData,
     isLoading,
@@ -12,7 +15,24 @@ const CartPage = () => {
     error,
   } = useQuery({
     queryKey: ['cart'],
-    queryFn: () => getCart(),
+    queryFn: async () => {
+      const cart = await getCart()
+
+      // Fetch each product fully and store in cache
+      await Promise.all(
+        cart.items.map(async (item) => {
+          if (item?.product?._id) {
+            const fullProduct = await getProductById(item.product._id)
+            queryClient.setQueryData(
+              ['getProductById', item.product._id],
+              fullProduct,
+            )
+          }
+        }),
+      )
+
+      return cart
+    },
     refetchOnWindowFocus: true,
   })
 

@@ -15,7 +15,6 @@ const CartCard = ({ item }) => {
   }
 
   const queryClient = useQueryClient()
-  const { increment, decrement } = useCartStore()
   const navigate = useNavigate()
 
   const [itemToDeleteId, setItemToDeleteId] = useState(null)
@@ -26,10 +25,13 @@ const CartCard = ({ item }) => {
   console.log('item:', item)
 
   const { data: productData } = useQuery({
-    queryKey: ['getProductById', item.product._id],
+    queryKey: ['getProductById', item?.product?._id],
     queryFn: () => getProductById(item.product._id),
-    staleTime: 60 * 1000,
+    staleTime: 0,
+    enabled: Boolean(item?.product?._id),
   })
+
+  console.log('productData:', productData)
 
   if (!productData) {
     return <div>Loading...</div>
@@ -49,7 +51,13 @@ const CartCard = ({ item }) => {
         'getProductById',
         product_id,
       ])
-      const currentStock = currentProductData?.stock ?? 0
+
+      if (
+        action === 'increment' &&
+        (!currentProductData || currentProductData.stock <= 0)
+      ) {
+        return // don't optimistically update if no stock
+      }
 
       queryClient.setQueryData(['cart'], (oldCartData) => {
         if (!oldCartData || !oldCartData.items) return oldCartData
