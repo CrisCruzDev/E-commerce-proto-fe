@@ -4,6 +4,7 @@ import { getCart } from '../api/cartApi'
 import CartCard from '../components/cartPageComponents/CartCard'
 import { SummaryCard } from '../components/cartPageComponents/SummaryCard'
 import { getProductById } from '../api/productApi'
+import { Toaster } from 'react-hot-toast'
 
 const CartPage = () => {
   const queryClient = useQueryClient()
@@ -108,6 +109,7 @@ const CartPage = () => {
           <SummaryCard item={cartItems} />
         </div>
       </div>
+      <Toaster></Toaster>
     </div>
   )
 }

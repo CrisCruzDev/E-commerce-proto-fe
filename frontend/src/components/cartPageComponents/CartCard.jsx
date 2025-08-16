@@ -98,6 +98,8 @@ const CartCard = ({ item }) => {
       if (context?.previousCart) {
         queryClient.setQueryData(['cart'], context.previousCart)
       }
+      // optionally: show toast to user
+      alert(err.response?.data?.message || 'Something went wrong!')
     },
   })
 
@@ -150,9 +152,8 @@ const CartCard = ({ item }) => {
 
   const handleIncrement = (pid) => {
     console.log('incrementID:', pid)
-    if (item.quantity >= productData.stock) {
-      toast.error('Cannot add more items than are in stock.')
-      return
+    if (productData?.stock <= 0) {
+      toast.error('Out of stock')
     }
     updateQtyMutation.mutate({
       product_id: item.product._id,
@@ -209,10 +210,7 @@ const CartCard = ({ item }) => {
             <button
               className='w-full hover:!bg-gray-100 cursor-pointer p-1'
               onClick={() => handleIncrement(item.product._id)}
-              disabled={
-                updateQtyMutation.isPending ||
-                item.quantity >= productData?.stock
-              }
+              disabled={updateQtyMutation.isPending || productData?.stock <= 0}
             >
               +
             </button>
@@ -230,9 +228,7 @@ const CartCard = ({ item }) => {
           <button
             className='w-full hover:!bg-gray-100 cursor-pointer p-1'
             onClick={() => handleIncrement(item.product._id)}
-            disabled={
-              updateQtyMutation.isPending || item.quantity >= productData?.stock
-            }
+            disabled={updateQtyMutation.isPending || productData?.stock <= 0}
           >
             +
           </button>
@@ -257,14 +253,14 @@ const CartCard = ({ item }) => {
             </p>
             <div className='flex justify-end !space-x-4'>
               <button
-                className='!px-4 !py-1.5 !bg-gray-200 text-gray-800 hover:!bg-gray-300 transition-colors duration-200'
+                className='!px-4 !py-1.5 !bg-gray-200 text-gray-800 hover:!bg-gray-300 transition-colors duration-200 cursor-pointer'
                 onClick={closeConfirmModal}
               >
                 Cancel
               </button>
 
               <button
-                className='!px-4 !py-1.5 !bg-black/90 !text-white hover:!bg-black transition-colors duration-200'
+                className='!px-4 !py-1.5 !bg-black/90 !text-white hover:!bg-black transition-colors duration-200 cursor-pointer'
                 onClick={handleConfirmRemove}
               >
                 Remove
