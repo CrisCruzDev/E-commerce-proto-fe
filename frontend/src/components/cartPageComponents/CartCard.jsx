@@ -45,6 +45,7 @@ const CartCard = ({ item }) => {
     },
     onMutate: async ({ product_id, action }) => {
       await queryClient.cancelQueries(['cart'])
+
       const previousCart = queryClient.getQueryData(['cart'])
 
       const currentProductData = queryClient.getQueryData([
@@ -80,7 +81,18 @@ const CartCard = ({ item }) => {
         return { ...oldCartData, items: updatedItems }
       })
 
-      return { previousCart }
+      // Update product stock optimistically
+      if (currentProductData) {
+        queryClient.setQueryData(['getProductById', product_id], {
+          ...currentProductData,
+          stock:
+            action === 'increment'
+              ? currentProductData.stock - 1
+              : currentProductData.stock + 1,
+        })
+      }
+
+      return { previousCart, currentProductData }
     },
 
     // Ensure data is fresh from server
@@ -97,6 +109,12 @@ const CartCard = ({ item }) => {
       console.log('onError:', err)
       if (context?.previousCart) {
         queryClient.setQueryData(['cart'], context.previousCart)
+      }
+      if (context?.previousProduct) {
+        queryClient.setQueryData(
+          ['getProductById', variables.product_id],
+          context.previousProduct,
+        )
       }
       // optionally: show toast to user
       alert(err.response?.data?.message || 'Something went wrong!')
@@ -154,6 +172,7 @@ const CartCard = ({ item }) => {
     console.log('incrementID:', pid)
     if (productData?.stock <= 0) {
       toast.error('Out of stock')
+      return
     }
     updateQtyMutation.mutate({
       product_id: item.product._id,
@@ -210,7 +229,7 @@ const CartCard = ({ item }) => {
             <button
               className='w-full hover:!bg-gray-100 cursor-pointer p-1'
               onClick={() => handleIncrement(item.product._id)}
-              disabled={updateQtyMutation.isPending || productData?.stock <= 0}
+              disabled={updateQtyMutation.isPending}
             >
               +
             </button>
@@ -228,7 +247,7 @@ const CartCard = ({ item }) => {
           <button
             className='w-full hover:!bg-gray-100 cursor-pointer p-1'
             onClick={() => handleIncrement(item.product._id)}
-            disabled={updateQtyMutation.isPending || productData?.stock <= 0}
+            disabled={updateQtyMutation.isPending}
           >
             +
           </button>
@@ -251,19 +270,42 @@ const CartCard = ({ item }) => {
             <p className='mb-6 text-gray-700'>
               Are you sure you want to remove this item from your cart?
             </p>
-            <div className='flex justify-end !space-x-4'>
+            <div className='flex justify-end space-x-4'>
               <button
-                className='!px-4 !py-1.5 !bg-gray-200 text-gray-800 hover:!bg-gray-300 transition-colors duration-200 cursor-pointer'
+                className='px-4 py-1.5 bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors duration-200 cursor-pointer'
                 onClick={closeConfirmModal}
               >
                 Cancel
               </button>
 
               <button
-                className='!px-4 !py-1.5 !bg-black/90 !text-white hover:!bg-black transition-colors duration-200 cursor-pointer'
+                className='px-4 py-1.5 bg-black/90 text-white hover:bg-black transition-colors duration-200 cursor-pointer'
                 onClick={handleConfirmRemove}
               >
-                Remove
+                {removeFromCartMutation.isPending ? (
+                  <svg
+                    className='animate-spin h-5 w-5 text-white mx-auto'
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                  >
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                    />
+                    <path
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
+                    />
+                  </svg>
+                ) : (
+                  'Remove'
+                )}
               </button>
             </div>
           </div>

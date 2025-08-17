@@ -7,6 +7,7 @@ import CartPage from './pages/CartPage'
 import ProductDetails from './pages/ProductDetails'
 import EditProductPage from './pages/EditProductPage'
 import './index.css'
+import Footer from './components/footer'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path='/product/:id' element={<ProductDetails />} />
         <Route path='/edit/:id' element={<EditProductPage />} />
       </Routes>
+      <Footer />
     </>
   )
 }

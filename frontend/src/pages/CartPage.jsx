@@ -73,14 +73,14 @@ const CartPage = () => {
     // Check the length of the extracted cartItems array
     return (
       <div className='flex flex-col items-center justify-center h-screen'>
-        <p className='text-2xl font-semibold text-gray-700 mb-4'>
-          Your cart is empt
+        <p className='text-5xl font-semibold text-gray-700 mb-4'>
+          Your cart is empty
         </p>
         <Link
           to='/'
-          className='px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 duration-150'
+          className='px-8 py-2 border border-black/50 hover:bg-gray-100 text-black  duration-150'
         >
-          Continue
+          Continue shopping
         </Link>
       </div>
     )
@@ -109,7 +109,7 @@ const CartPage = () => {
           <SummaryCard item={cartItems} />
         </div>
       </div>
-      <Toaster></Toaster>
+      <Toaster position='bottom-right' reverseOrder={false} />
     </div>
   )
 }

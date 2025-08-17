@@ -29,7 +29,29 @@ const ProductCard = ({ product: initialProductData }) => {
     }
   }, [data])
 
-  if (isLoading || !data) return <div>Loading products...</div>
+  if (isLoading || !data)
+    return (
+      <svg
+        className='animate-spin h-10 w-10 text-white mx-auto'
+        xmlns='http://www.w3.org/2000/svg'
+        fill='none'
+        viewBox='0 0 24 24'
+      >
+        <circle
+          className='opacity-25'
+          cx='12'
+          cy='12'
+          r='10'
+          stroke='currentColor'
+          strokeWidth='4'
+        />
+        <path
+          className='opacity-75'
+          fill='currentColor'
+          d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
+        />
+      </svg>
+    )
   if (isError)
     return <div>Error: {error.response?.data?.message || error.message}</div>
 
@@ -90,26 +112,51 @@ const ProductCard = ({ product: initialProductData }) => {
             onClick={() => addToCartMutation.mutate({ id: data?._id, qty: 1 })}
             disabled={isOutOfStock || addToCartMutation.isLoading}
           >
-            <div className='flex px-2 items-center !space-x-1'>
-              <svg
-                className='w-3 h-3 text-gray-800 dark:text-white'
-                aria-hidden='true'
-                xmlns='http://www.w3.org/2000/svg'
-                width='24'
-                height='24'
-                fill='none'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6'
-                />
-              </svg>
-              <p className='text-white text-xs'>Add to cart</p>
-            </div>
+            {addToCartMutation.isPending ? (
+              // Spinner
+              <div className='flex items-center px-9 space-x-1'>
+                <svg
+                  className='animate-spin h-5 w-5 text-white mx-auto'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <circle
+                    className='opacity-25'
+                    cx='12'
+                    cy='12'
+                    r='10'
+                    stroke='currentColor'
+                    strokeWidth='4'
+                  />
+                  <path
+                    className='opacity-75'
+                    fill='currentColor'
+                    d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
+                  />
+                </svg>
+              </div>
+            ) : (
+              // Default cart icon + text
+              <div className='flex items-center px-2 space-x-1'>
+                <svg
+                  className='w-3 h-3 text-white'
+                  aria-hidden='true'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    stroke='currentColor'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6'
+                  />
+                </svg>
+                <p className='text-white text-xs'>Add to cart</p>
+              </div>
+            )}
           </button>
         </div>
       </div>

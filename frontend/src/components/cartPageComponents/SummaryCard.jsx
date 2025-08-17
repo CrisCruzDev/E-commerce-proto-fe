@@ -48,7 +48,7 @@ export const SummaryCard = ({ item }) => {
         </div>
 
         <a href='/'>
-          <button className='w-full py-3 border border-black font-light hover:bg-gray-100 duration-150 cursor-pointer'>
+          <button className='w-full py-3 border border-black/50 font-light hover:bg-gray-100 duration-150 cursor-pointer'>
             Continue shopping
           </button>
         </a>
