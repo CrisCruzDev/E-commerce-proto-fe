@@ -3,10 +3,11 @@ import { getProducts } from '../api/productApi'
 import { useQuery } from '@tanstack/react-query'
 import blur from '../assets/blur.png'
 import { Toaster } from 'react-hot-toast'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const HomePage = () => {
   const productSectionRef = useRef(null) // <== Step 1
+  const [isLargeScreen, setIsLargeScreen] = useState(false)
 
   const handleShopNowClick = () => {
     productSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -20,6 +21,17 @@ const HomePage = () => {
       }, 0)
     }
   }, [location])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024) // 1024px is Tailwind's 'lg'
+    }
+
+    handleResize() // check on mount
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const {
     data: products,
@@ -110,7 +122,7 @@ const HomePage = () => {
       <section className='relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden'>
         <div
           className='py-20 absolute inset-0 bg-cover bg-center -z-20'
-          style={{ backgroundImage: `url(${blur})` }}
+          style={isLargeScreen ? { backgroundImage: `url(${blur})` } : {}}
         >
           {/* Updated centering container */}
           <div className='flex justify-center'>
