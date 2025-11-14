@@ -11,23 +11,12 @@ export const useAuthStore = create(
 
       setCredentials: ({ user, accessToken, refreshToken }) =>
         set({ user, accessToken, refreshToken }),
-
       setToken: (accessToken) => set({ accessToken }),
-
-      updateUser: (user) => set({ user }),
+      setUser: (user) => set({ user }),
 
       logout: () => {
         set({ user: null, accessToken: null, refreshToken: null })
         localStorage.removeItem('auth-store')
-      },
-
-      rehydrateUser: () => {
-        const state = get()
-        if (state.user && state.accessToken) {
-          api.defaults.headers.common[
-            'Authorization'
-          ] = `Bearer ${state.accessToken}`
-        }
       },
     }),
     {

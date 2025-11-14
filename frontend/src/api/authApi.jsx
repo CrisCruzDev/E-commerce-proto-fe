@@ -9,10 +9,6 @@ export const loginUser = async (credentials) => {
   apiHandler(() => api.post('/auth/login', credentials))
 }
 
-export const refreshAccessToken = async (token) => {
-  apiHandler(() => api.post('/auth/refresh-token', token))
-}
-
 export const logoutUser = async (token) => {
   apiHandler(() => api.post('/auth/logout', token))
 }

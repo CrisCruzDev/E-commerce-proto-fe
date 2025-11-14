@@ -2,19 +2,36 @@ import { useMutation } from '@tanstack/react-query'
 import { Link, Navigate } from 'react-router-dom'
 import { loginUser } from '../../api/authApi'
 import { LogoSvg } from '../LogoSvg'
+import { useAuthStore } from '../../store/auth'
+import { useState } from 'react'
 
 export const LoginCard = () => {
+  const { setCredentials } = useAuthStore()
+  const [form, setForm] = useState({ email: '', password: '' })
+
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
       console.log('Login success:', data)
-      // store access token
-      localStorage.setItem('accessToken', data.accessToken)
+      setCredentials({
+        user: data.user,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      })
     },
     onError: (err) => {
       console.error('Login error:', err)
     },
   })
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    loginMutation.mutate(form)
+  }
+
+  const handleInput = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
   return (
     <>
       <div className='flex flex-col items-start justify-center pt-10 px-20'>
@@ -27,10 +44,12 @@ export const LoginCard = () => {
         <div className='bg-white w-90 h-115 flex flex-col items-center py-7 shadow-sm'>
           <h1 className='text-[25px] font-medium'>Sign in</h1>
           <div className='w-full pt-10 px-12'>
-            <form onSubmit='' className='flex flex-col space-y-3'>
+            <form onSubmit={handleSubmit} className='flex flex-col space-y-3'>
               <input
                 placeholder='Email address'
                 type='email'
+                value={form.email}
+                onChange={handleInput}
                 name='email'
                 id='email'
                 className='block w-full border border-gray-300 py-2 px-3'
@@ -38,6 +57,8 @@ export const LoginCard = () => {
               <input
                 placeholder='password'
                 type='password'
+                value={form.password}
+                onChange={handleInput}
                 name='password'
                 id='password'
                 className='block w-full border border-gray-300 py-2 px-3'
@@ -48,12 +69,24 @@ export const LoginCard = () => {
                 </Link>
               </div>
               <div className='pt-7'>
-                <button
-                  type='submit'
-                  className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
-                >
-                  Sign in
-                </button>
+                {loginMutation.isPending ? (
+                  <div class='absolute inset-0 bg-black/50 backdrop-blur-md'>
+                    <button
+                      disabled
+                      type='submit'
+                      className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
+                    >
+                      Signing in...
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type='submit'
+                    className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
+                  >
+                    Sign in
+                  </button>
+                )}
               </div>
             </form>
           </div>

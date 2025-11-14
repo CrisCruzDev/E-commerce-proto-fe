@@ -11,9 +11,9 @@ const api = axios.create({
 // 🧩 Attach token before each request
 api.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    const { accessToken } = useAuthStore.getState()
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`
     }
     return config
   },
@@ -31,16 +31,21 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       try {
-        const res = await axios.post(
-          `${api.defaults.baseURL}/auth/refresh`,
+        const res = await api.post(
+          '/auth/refresh-token',
           { token: refreshToken },
           { withCredentials: true },
         )
 
-        const newAccessToken = res.data.accessToken
+        const newAccessToken = res.data?.accessToken
         setToken(newAccessToken)
 
         // retry the failed request
+
+        // Update axios default headers
+        api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`
+
+        // Attach new token to the retry
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
         return api(originalRequest)
       } catch (refreshErr) {

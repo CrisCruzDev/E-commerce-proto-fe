@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import bgLogin from '../assets/login-bg.png'
 import { RegisterCard } from '../components/authPage/registerForm'
-import { LoginCard } from '../components/authPage/LoginForm'
+import { LoginCard } from '../components/authPage/loginForm'
 
 export const AuthPage = () => {
   const [userData, setUserData] = useState({
