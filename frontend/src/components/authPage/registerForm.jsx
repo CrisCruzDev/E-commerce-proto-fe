@@ -1,36 +1,22 @@
-import { useMutation } from '@tanstack/react-query'
-import { registerUser } from '../../api/authApi'
-import { Link } from 'react-router-dom'
-import { LogoSvg } from '../LogoSvg'
-import { useAuthStore } from '../../store/auth'
+import { useMutation } from '@tanstack/react-query';
+import { registerUser } from '../../api/authApi';
+import { Link } from 'react-router-dom';
+import { LogoSvg } from '../LogoSvg';
+import { useAuthStore } from '../../store/auth';
+import toast from 'react-hot-toast';
+import { useRegister } from '../../hooks/useAuth';
 
-export const RegisterCard = () => {
-  const { setCredentials } = useAuthStore()
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+export const RegisterCard = ({ userData, setUserData }) => {
+  const registerMutation = useRegister();
 
-  const registerMutation = useMutation({
-    mutationFn: registerUser,
-    onSuccess: (data) => {
-      console.log('Register success:', data)
-      setCredentials({
-        user: data.user,
-        accesToken: data.accesToken,
-        refreshToken: data.refreshToken,
-      })
-    },
-    onError: (err) => {
-      console.error('Register error:', err)
-    },
-  })
+  const handleSubmit = e => {
+    e.preventDefault();
+    registerMutation.mutate(userData);
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    registerMutation.mutate(form)
-  }
-
-  const handleInput = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleInput = e => {
+    setUserData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
   return (
     <>
       <div className='flex flex-col px-12 justify-center items-center w-60% h-full bg-[#FFFAF5]'>
@@ -46,7 +32,7 @@ export const RegisterCard = () => {
                 <input
                   placeholder='name'
                   type='text'
-                  value={form.name}
+                  value={userData.name}
                   onChange={handleInput}
                   name='name'
                   id='name'
@@ -55,7 +41,7 @@ export const RegisterCard = () => {
                 <input
                   placeholder='Email address'
                   type='email'
-                  value={form.email}
+                  value={userData.email}
                   onChange={handleInput}
                   name='email'
                   id='email'
@@ -64,7 +50,7 @@ export const RegisterCard = () => {
                 <input
                   placeholder='password'
                   type='password'
-                  value={form.password}
+                  value={userData.password}
                   onChange={handleInput}
                   name='password'
                   id='password'
@@ -102,5 +88,5 @@ export const RegisterCard = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};

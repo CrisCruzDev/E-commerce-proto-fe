@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react'
-import { createProduct, deleteProduct, updateProduct } from '../api/productApi'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { ProductInfoStep } from '../components/createPageSteps/ProductInfoStep'
-import { PricingStep } from '../components/createPageSteps/PricingStep'
-import { ReviewStep } from '../components/createPageSteps/ReviewStep'
-import { FiCheck } from 'react-icons/fi'
-import toast, { Toaster } from 'react-hot-toast'
-import { useProductStore } from '../store/product'
+import { useEffect, useState } from 'react';
+import { createProduct, deleteProduct, updateProduct } from '../api/productApi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ProductInfoStep } from '../components/createPageSteps/ProductInfoStep';
+import { PricingStep } from '../components/createPageSteps/PricingStep';
+import { ReviewStep } from '../components/createPageSteps/ReviewStep';
+import { FiCheck } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { useProductStore } from '../store/product';
 
 const CreatePage = ({ isEditMode = false }) => {
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
-  const { product: productToEdit, setUpdateProduct } = useProductStore()
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { product: productToEdit, setUpdateProduct } = useProductStore();
 
   const [productFormData, setProductFormData] = useState({
     name: '',
@@ -22,20 +22,20 @@ const CreatePage = ({ isEditMode = false }) => {
     category: '',
     brand: '',
     stock: '',
-  })
+  });
 
   useEffect(() => {
     if (isEditMode && productToEdit) {
-      setProductFormData(productToEdit)
+      setProductFormData(productToEdit);
     }
-  }, [isEditMode, productToEdit])
+  }, [isEditMode, productToEdit]);
 
-  console.log('Loaded product from store:', productToEdit)
-  console.log('image product from store:', productToEdit.image)
-  console.log('image form data:', productFormData.image)
+  console.log('Loaded product from store:', productToEdit);
+  console.log('image product from store:', productToEdit.image);
+  console.log('image form data:', productFormData.image);
 
-  const [currentStep, setCurrentStep] = useState(1)
-  const [validationErrors, setValidationErrors] = useState({})
+  const [currentStep, setCurrentStep] = useState(1);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const sidebarSteps = [
     {
@@ -45,7 +45,7 @@ const CreatePage = ({ isEditMode = false }) => {
     },
     { id: 2, name: 'Pricing', requiredFields: ['price'] },
     { id: 3, name: 'Review', requiredFields: [] },
-  ]
+  ];
 
   const resetForm = () => {
     setProductFormData({
@@ -56,126 +56,126 @@ const CreatePage = ({ isEditMode = false }) => {
       category: '',
       brand: '',
       stock: '',
-    })
-    setValidationErrors({})
-    setCurrentStep(1)
-  }
+    });
+    setValidationErrors({});
+    setCurrentStep(1);
+  };
 
   const createProductMutation = useMutation({
-    mutationFn: async (newProduct) => await createProduct(newProduct),
+    mutationFn: async newProduct => await createProduct(newProduct),
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['products'] })
+      await queryClient.cancelQueries({ queryKey: ['products'] });
     },
     onSuccess: (data, variables) => {
-      setUpdateProduct(data)
-      queryClient.setQueryData(['getProductById', data._id], data)
-      queryClient.invalidateQueries(['products'])
-      console.log(data.message)
-      toast.success('Product created!')
-      resetForm()
-      navigate('/')
+      setUpdateProduct(data);
+      queryClient.setQueryData(['getProductById', data._id], data);
+      queryClient.invalidateQueries(['products']);
+      console.log(data.message);
+      toast.success('Product created!');
+      resetForm();
+      navigate('/');
     },
-    onError: (err) => {
-      console.error('Error creating product:', err)
-      toast.error('Create product error!')
+    onError: err => {
+      console.error('Error creating product:', err);
+      toast.error('Create product error!');
     },
-  })
+  });
 
   const updateProductMutation = useMutation({
     mutationFn: async ({ id, product }) => {
-      return await updateProduct({ id, product })
+      return await updateProduct({ id, product });
     },
-    onSuccess: (updatedProduct) => {
-      setUpdateProduct(updatedProduct)
+    onSuccess: updatedProduct => {
+      setUpdateProduct(updatedProduct);
       queryClient.setQueryData(
         ['getProductById', updatedProduct._id],
-        updatedProduct,
-      )
-      queryClient.invalidateQueries({ queryKey: ['products'] })
-      toast.success('Product updated successfully!')
-      navigate('/')
+        updatedProduct
+      );
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Product updated successfully!');
+      navigate('/');
     },
-    onError: (err) => {
-      console.error('[Mutation Error]', err)
-      toast.error('Update product error!')
+    onError: err => {
+      console.error('[Mutation Error]', err);
+      toast.error('Update product error!');
     },
-  })
+  });
 
   const deleteProductMutation = useMutation({
-    mutationFn: async (pid) => {
-      await deleteProduct(pid)
+    mutationFn: async pid => {
+      await deleteProduct(pid);
     },
     onSuccess: (message, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['products'] })
-      queryClient.removeQueries({ queryKey: ['getProductById', variables] })
-      console.log('Product Deleted:', message)
-      toast.success('Product deleted!')
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.removeQueries({ queryKey: ['getProductById', variables] });
+      console.log('Product Deleted:', message);
+      toast.success('Product deleted!');
 
-      navigate('/')
+      navigate('/');
     },
     onError: (err, variables) => {
-      console.error('Error deleting product:', err)
+      console.error('Error deleting product:', err);
 
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
-        'Failed to delete product.'
+        'Failed to delete product.';
 
-      toast.error(`Error: ${errorMessage}`)
+      toast.error(`Error: ${errorMessage}`);
 
       if (err.response?.status === 401) {
-        navigate('/')
+        navigate('/');
       }
     },
-  })
+  });
 
-  const validateStep = (step) => {
-    const errors = {}
-    const currentStepConfig = sidebarSteps.find((s) => s.id === step)
+  const validateStep = step => {
+    const errors = {};
+    const currentStepConfig = sidebarSteps.find(s => s.id === step);
 
     if (currentStepConfig) {
-      currentStepConfig.requiredFields.forEach((field) => {
-        const value = productFormData[field]
+      currentStepConfig.requiredFields.forEach(field => {
+        const value = productFormData[field];
 
         if (field === 'price') {
           if (!value || parseFloat(value) === 0) {
-            errors[field] = 'Price cannot be empty or zero.'
+            errors[field] = 'Price cannot be empty or zero.';
           }
         } else {
           if (!value) {
-            errors[field] = 'This field is required.'
+            errors[field] = 'This field is required.';
           }
         }
-      })
+      });
     }
-    setValidationErrors(errors)
-    return Object.keys(errors).length === 0
-  }
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prevStep) => prevStep + 1)
+      setCurrentStep(prevStep => prevStep + 1);
     } else {
-      toast.error('Please fill in all required fields!')
+      toast.error('Please fill in all required fields!');
     }
-  }
+  };
 
   const handlePrevious = () => {
-    setCurrentStep((prevStep) => prevStep - 1)
-    setValidationErrors({})
-  }
+    setCurrentStep(prevStep => prevStep - 1);
+    setValidationErrors({});
+  };
 
-  const handleFormChange = (newData) => {
-    setProductFormData((prevData) => ({ ...prevData, ...newData }))
+  const handleFormChange = newData => {
+    setProductFormData(prevData => ({ ...prevData, ...newData }));
     if (Object.keys(newData).length === 1) {
-      const fieldName = Object.keys(newData)[0]
-      setValidationErrors((prevErrors) => {
-        const newErrors = { ...prevErrors }
-        delete newErrors[fieldName]
-        return newErrors
-      })
+      const fieldName = Object.keys(newData)[0];
+      setValidationErrors(prevErrors => {
+        const newErrors = { ...prevErrors };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
     }
-  }
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -188,7 +188,7 @@ const CreatePage = ({ isEditMode = false }) => {
             validationErrors={validationErrors}
             isSubmitting={createProductMutation.isPending}
           />
-        )
+        );
       case 2:
         return (
           <PricingStep
@@ -199,7 +199,7 @@ const CreatePage = ({ isEditMode = false }) => {
             validationErrors={validationErrors}
             isSubmitting={createProductMutation.isPending}
           />
-        )
+        );
       case 3:
         return (
           <ReviewStep
@@ -213,14 +213,14 @@ const CreatePage = ({ isEditMode = false }) => {
             deleteProductMutation={deleteProductMutation}
             isEditing={isEditMode}
           />
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = e => {
+    e.preventDefault();
 
     if (currentStep === 3) {
       try {
@@ -229,25 +229,25 @@ const CreatePage = ({ isEditMode = false }) => {
             ...productFormData,
             price: parseFloat(productFormData.price),
             stock: parseInt(productFormData.stock),
-          }
+          };
 
           if (isEditMode && productToEdit?._id) {
             updateProductMutation.mutate({
               id: productToEdit._id,
               product: newProduct,
-            })
+            });
           } else {
             setTimeout(() => {
-              createProductMutation.mutate(newProduct)
-            }, 200)
+              createProductMutation.mutate(newProduct);
+            }, 200);
           }
         }
       } catch {
-        toast.error('Validation error')
+        toast.error('Validation error');
       }
-      return
+      return;
     }
-  }
+  };
 
   return (
     <div className='min-h-screen font-inter p-4 md:p-8 lg:p-12'>
@@ -255,21 +255,21 @@ const CreatePage = ({ isEditMode = false }) => {
         {/* Sidebar */}
         <nav className='lg:w-1/5 pt-4 lg:border-r border-gray-200'>
           <ul className='flex justify-center lg:justify-start lg:flex-col gap-4'>
-            {sidebarSteps.map((step) => (
+            {sidebarSteps.map(step => (
               <li key={step.id} className=''>
                 <a
                   href='#'
-                  onClick={(e) => {
-                    e.preventDefault()
+                  onClick={e => {
+                    e.preventDefault();
                     // Allow direct navigation to previous steps, but validate current step
                     if (step.id < currentStep) {
-                      setCurrentStep(step.id)
-                      setValidationErrors({}) // Clear errors when jumping back
+                      setCurrentStep(step.id);
+                      setValidationErrors({}); // Clear errors when jumping back
                     } else if (step.id === currentStep) {
                       // Do nothing if clicking current step
                     } else {
                       // Prevent jumping forward without validation
-                      toast.error('Please complete the current step first.')
+                      toast.error('Please complete the current step first.');
                     }
                   }}
                   className='flex items-center gap-1'
@@ -309,9 +309,8 @@ const CreatePage = ({ isEditMode = false }) => {
           </form>
         </div>
       </div>
-      <Toaster position='bottom-right' reverseOrder={false} />
     </div>
-  )
-}
+  );
+};
 
-export default CreatePage
+export default CreatePage;

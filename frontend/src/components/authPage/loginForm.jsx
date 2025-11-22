@@ -1,37 +1,51 @@
-import { useMutation } from '@tanstack/react-query'
-import { Link, Navigate } from 'react-router-dom'
-import { loginUser } from '../../api/authApi'
-import { LogoSvg } from '../LogoSvg'
-import { useAuthStore } from '../../store/auth'
-import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { loginUser } from '../../api/authApi';
+import { LogoSvg } from '../LogoSvg';
+import { useAuthStore } from '../../store/auth';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useLogin } from '../../hooks/useAuth';
 
-export const LoginCard = () => {
-  const { setCredentials } = useAuthStore()
-  const [form, setForm] = useState({ email: '', password: '' })
-
-  const loginMutation = useMutation({
-    mutationFn: loginUser,
-    onSuccess: (data) => {
-      console.log('Login success:', data)
-      setCredentials({
-        user: data.user,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-      })
+export const LoginCard = ({ userData, setUserData }) => {
+  const navigate = useNavigate();
+  const loginMutation = useLogin({
+    onError: () => {
+      setUserData(prev => ({ ...prev, password: '' }));
     },
-    onError: (err) => {
-      console.error('Login error:', err)
-    },
-  })
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    loginMutation.mutate(form)
-  }
+  console.log('UserData state:', userData);
+  console.log('Login mutation state:', {
+    isPending: loginMutation.isPending,
+    isError: loginMutation.isError,
+    isSuccess: loginMutation.isSuccess,
+  });
 
-  const handleInput = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    console.log('➡ SUBMIT TRIGGERED:', userData);
+
+    // frontend validation
+    if (!userData.email || !userData.password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userData.email)) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+
+    loginMutation.mutate(userData);
+  };
+
+  const handleInput = e => {
+    setUserData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   return (
     <>
       <div className='flex flex-col items-start justify-center pt-10 px-20'>
@@ -48,7 +62,7 @@ export const LoginCard = () => {
               <input
                 placeholder='Email address'
                 type='email'
-                value={form.email}
+                value={userData.email}
                 onChange={handleInput}
                 name='email'
                 id='email'
@@ -57,7 +71,7 @@ export const LoginCard = () => {
               <input
                 placeholder='password'
                 type='password'
-                value={form.password}
+                value={userData.password}
                 onChange={handleInput}
                 name='password'
                 id='password'
@@ -69,24 +83,13 @@ export const LoginCard = () => {
                 </Link>
               </div>
               <div className='pt-7'>
-                {loginMutation.isPending ? (
-                  <div class='absolute inset-0 bg-black/50 backdrop-blur-md'>
-                    <button
-                      disabled
-                      type='submit'
-                      className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
-                    >
-                      Signing in...
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type='submit'
-                    className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
-                  >
-                    Sign in
-                  </button>
-                )}
+                <button
+                  type='submit'
+                  disabled={loginMutation.isPending}
+                  className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
+                >
+                  {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
+                </button>
               </div>
             </form>
           </div>
@@ -189,5 +192,5 @@ export const LoginCard = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};

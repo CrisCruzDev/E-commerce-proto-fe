@@ -1,11 +1,12 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import Layout from './Layout'
-import HomePage from './pages/HomePage'
-import CreatePage from './pages/CreatePage'
-import CartPage from './pages/CartPage'
-import ProductDetails from './pages/ProductDetails'
-import EditProductPage from './pages/EditProductPage'
-import { AuthPage } from './pages/AuthPage'
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Layout from './Layout';
+import HomePage from './pages/HomePage';
+import CreatePage from './pages/CreatePage';
+import CartPage from './pages/CartPage';
+import ProductDetails from './pages/ProductDetails';
+import EditProductPage from './pages/EditProductPage';
+import { AuthPage } from './pages/AuthPage';
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   return (
@@ -15,7 +16,13 @@ function App() {
       <Route path='/register' element={<AuthPage />} />
 
       {/* Layout routes (with navbar + footer) */}
-      <Route element={<Layout />}>
+      <Route
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
         <Route path='/' element={<HomePage />} />
         <Route path='/create' element={<CreatePage />} />
         <Route path='/cart' element={<CartPage />} />
@@ -26,7 +33,7 @@ function App() {
       {/* Catch-all redirect */}
       <Route path='*' element={<Navigate to='/login' replace />} />
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

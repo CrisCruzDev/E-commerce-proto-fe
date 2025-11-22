@@ -1,38 +1,40 @@
-import ProductCard from '../components/productPageComponents/ProductCard'
-import { getProducts } from '../api/productApi'
-import { useQuery } from '@tanstack/react-query'
-import blur from '../assets/blur.png'
-import { Toaster } from 'react-hot-toast'
-import { useEffect, useRef, useState } from 'react'
+import ProductCard from '../components/productPageComponents/ProductCard';
+import { getProducts } from '../api/productApi';
+import { useQuery } from '@tanstack/react-query';
+import blur from '../assets/blur.png';
+import toast from 'react-hot-toast';
+import { useEffect, useRef, useState } from 'react';
+import { useProfile } from '../hooks/useAuth';
 
 const HomePage = () => {
-  const productSectionRef = useRef(null) // <== Step 1
-  const [isLargeScreen, setIsLargeScreen] = useState(false)
+  const productSectionRef = useRef(null); // <== Step 1
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   const handleShopNowClick = () => {
-    productSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    productSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   // Handle scrolling from navbar using hash
   useEffect(() => {
     if (location.hash === '#product-section') {
       setTimeout(() => {
-        productSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 0)
+        productSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 0);
     }
-  }, [location])
+  }, [location]);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1024) // 1024px is Tailwind's 'lg'
-    }
+      setIsLargeScreen(window.innerWidth >= 1024); // 1024px is Tailwind's 'lg'
+    };
 
-    handleResize() // check on mount
-    window.addEventListener('resize', handleResize)
+    handleResize(); // check on mount
+    window.addEventListener('resize', handleResize);
 
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
+  const { data } = useProfile();
   const {
     data: products,
     isLoading,
@@ -41,10 +43,10 @@ const HomePage = () => {
   } = useQuery({
     queryKey: ['products'],
     queryFn: () => getProducts(),
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: data => {
+      console.log(data);
     },
-  })
+  });
 
   const brands = [
     {
@@ -95,14 +97,14 @@ const HomePage = () => {
       name: 'Bose',
       svg: '<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Bose</title><path d="M14.052 10.589a.69.69 0 0 0-.588.332l-.54.915c-.114.19.036.399.235.399h1.873l-.336.568a.274.274 0 0 1-.24.139h-.29a.113.113 0 0 1-.102-.164c.035-.062.112-.19.112-.19h-1.699l-.246.418c-.115.194.038.405.232.405h3.174a.692.692 0 0 0 .598-.34c.12-.206.405-.69.527-.896.123-.205-.032-.41-.228-.41h-1.873l.347-.586a.276.276 0 0 1 .231-.123h.292c.095 0 .135.102.105.155-.03.053-.117.199-.117.199h1.696l.254-.43c.094-.16-.023-.392-.24-.392h-3.18.003zm-1.344 0H9.537c-.23 0-.47.12-.592.329-.124.207-1.13 1.911-1.24 2.096-.109.185.042.397.236.397h3.177c.255 0 .48-.141.592-.33.111-.188 1.13-1.915 1.237-2.094.106-.18-.03-.4-.24-.4v.002zm-1.598.636c-.045.076-.89 1.505-.936 1.585a.276.276 0 0 1-.236.134h-.295c-.094 0-.138-.102-.102-.163l.94-1.592a.274.274 0 0 1 .235-.13h.296c.085 0 .143.091.097.167l.001-.001zm-2.919-.636H4.61l-1.39 2.354H0v.47h6.598a.69.69 0 0 0 .596-.336l.41-.697c.085-.145-.004-.331-.164-.379a.703.703 0 0 0 .583-.329c.115-.193.298-.506.402-.682a.266.266 0 0 0-.234-.4v-.001zM6.29 12.402l-.243.411a.267.267 0 0 1-.233.132h-.9l.419-.708h.857a.11.11 0 0 1 .099.166zm.694-1.178-.242.41a.266.266 0 0 1-.233.131h-.9l.418-.708h.858c.09 0 .14.093.098.167h.001zm11.194-.635-1.667 2.823h4.042l.276-.469h-2.345l.418-.707h2.345l.278-.47H19.18l.418-.709H24v-.468h-5.822z"/></svg>',
     },
-  ]
+  ];
 
   if (isLoading) {
     return (
       <div className='flex justify-center items-center h-screen'>
         <p className='text-xl'>Loading products...</p>
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -113,7 +115,7 @@ const HomePage = () => {
           {error.response?.data?.message || error.message}
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -177,7 +179,7 @@ const HomePage = () => {
         >
           {products && products.length > 0 ? (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-5 md:gap-y-10 gap-x-5 md:gap-x-20'>
-              {products.map((product) => (
+              {products.map(product => (
                 <div key={product._id} className='flex justify-center'>
                   <ProductCard product={product} />
                 </div>
@@ -189,13 +191,12 @@ const HomePage = () => {
             </p>
           )}
         </div>
-        <Toaster position='bottom-right' reverseOrder={false} />
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;
 
 // <footer className='bg-black/92 py-15'>
 //   <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:flex md:justify-between md:items-center'>

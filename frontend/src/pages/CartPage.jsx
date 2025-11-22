@@ -1,13 +1,13 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { getCart } from '../api/cartApi'
-import CartCard from '../components/cartPageComponents/CartCard'
-import { SummaryCard } from '../components/cartPageComponents/SummaryCard'
-import { getProductById } from '../api/productApi'
-import { Toaster } from 'react-hot-toast'
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { getCart } from '../api/cartApi';
+import CartCard from '../components/cartPageComponents/CartCard';
+import { SummaryCard } from '../components/cartPageComponents/SummaryCard';
+import { getProductById } from '../api/productApi';
+import toast from 'react-hot-toast';
 
 const CartPage = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const {
     data: cartData,
@@ -17,34 +17,34 @@ const CartPage = () => {
   } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
-      const cart = await getCart()
+      const cart = await getCart();
 
       // Fetch each product fully and store in cache
       await Promise.all(
-        cart.items.map(async (item) => {
+        cart.items.map(async item => {
           if (item?.product?._id) {
-            const fullProduct = await getProductById(item.product._id)
+            const fullProduct = await getProductById(item.product._id);
             queryClient.setQueryData(
               ['getProductById', item.product._id],
-              fullProduct,
-            )
+              fullProduct
+            );
           }
-        }),
-      )
+        })
+      );
 
-      return cart
+      return cart;
     },
     refetchOnWindowFocus: true,
-  })
+  });
 
-  console.log('cart: ', cartData)
+  console.log('cart: ', cartData);
 
   if (isLoading) {
     return (
       <div className='flex items-center justify-center h-screen'>
         <p className='text-lg text-gray-600'>Loading cart...</p>
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -60,14 +60,14 @@ const CartPage = () => {
           Go Back
         </Link>
       </div>
-    )
+    );
   }
 
   const cartItems = (cartData?.items || []).filter(
-    (item) => item.product !== null,
-  )
+    item => item.product !== null
+  );
 
-  console.log('cartItems: ', cartItems)
+  console.log('cartItems: ', cartItems);
 
   if (cartItems.length === 0) {
     // Check the length of the extracted cartItems array
@@ -83,7 +83,7 @@ const CartPage = () => {
           Continue shopping
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -100,8 +100,8 @@ const CartPage = () => {
             </div>
           </div>
 
-          {cartItems.map((item) =>
-            item.product ? <CartCard key={item._id} item={item} /> : null,
+          {cartItems.map(item =>
+            item.product ? <CartCard key={item._id} item={item} /> : null
           )}
         </div>
 
@@ -109,9 +109,8 @@ const CartPage = () => {
           <SummaryCard item={cartItems} />
         </div>
       </div>
-      <Toaster position='bottom-right' reverseOrder={false} />
     </div>
-  )
-}
+  );
+};
 
-export default CartPage
+export default CartPage;

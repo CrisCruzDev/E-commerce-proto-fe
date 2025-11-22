@@ -1,50 +1,50 @@
-import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { useAddToCart } from '../hooks/useAddToCart'
-import { useCartStore } from '../store/cart'
-import { useEffect, useState } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
-import { getProductById } from '../api/productApi'
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { useAddToCart } from '../hooks/useAddToCart';
+import { useCartStore } from '../store/cart';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { getProductById } from '../api/productApi';
 
 const ProductDetails = () => {
-  const { id: routeId } = useParams() // if you're using `/product/:id`
-  const productId = routeId
-  console.log('productId: ', productId)
+  const { id: routeId } = useParams(); // if you're using `/product/:id`
+  const productId = routeId;
+  console.log('productId: ', productId);
 
-  const addToCartMutation = useAddToCart()
-  const { resetQuantity } = useCartStore()
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [qty, setQty] = useState(1)
+  const addToCartMutation = useAddToCart();
+  const { resetQuantity } = useCartStore();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [qty, setQty] = useState(1);
 
   const { data: productFromQuery } = useQuery({
     queryKey: ['getProductById', productId],
     queryFn: () => getProductById(productId),
-  })
+  });
 
-  const product = productFromQuery
-  const currentStock = product?.stock || 0
+  const product = productFromQuery;
+  const currentStock = product?.stock || 0;
 
   useEffect(() => {
     if (addToCartMutation.isSuccess) {
-      setQty(1)
-      resetQuantity()
-      addToCartMutation.reset()
+      setQty(1);
+      resetQuantity();
+      addToCartMutation.reset();
     }
-  }, [addToCartMutation.isSuccess])
+  }, [addToCartMutation.isSuccess]);
 
   const handleQuantity = () => {
     if (qty > currentStock) {
-      toast.error(`Only ${currentStock} in stock.`)
-      return
+      toast.error(`Only ${currentStock} in stock.`);
+      return;
     }
 
-    if (currentStock === 0) return
+    if (currentStock === 0) return;
 
-    addToCartMutation.mutate({ id: product?._id, qty: qty })
-  }
+    addToCartMutation.mutate({ id: product?._id, qty: qty });
+  };
 
-  const isOutOfStock = currentStock === 0
-  console.log('SingleProductFromQuery: ', product)
+  const isOutOfStock = currentStock === 0;
+  console.log('SingleProductFromQuery: ', product);
 
   return (
     <div className='bg-white h-full'>
@@ -136,12 +136,12 @@ const ProductDetails = () => {
                       isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                     value={qty}
-                    onChange={(e) => {
-                      setQty(Number(e.target.value))
+                    onChange={e => {
+                      setQty(Number(e.target.value));
                     }}
                     disabled={isOutOfStock}
                   >
-                    {[...Array(10).keys()].map((i) => (
+                    {[...Array(10).keys()].map(i => (
                       <option key={i + 1}>{i + 1}</option>
                     ))}
                   </select>
@@ -201,7 +201,6 @@ const ProductDetails = () => {
           <hr className='mt-2 border-gray-200' />
         </div>
       </div>
-      <Toaster position='bottom-right' reverseOrder={false} />
       {isExpanded && (
         <div
           className='fixed inset-0 bg-black/20 backdrop-blur-[5px] z-50 flex items-center justify-center p-20'
@@ -215,7 +214,7 @@ const ProductDetails = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProductDetails
+export default ProductDetails;
