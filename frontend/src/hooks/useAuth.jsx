@@ -69,17 +69,21 @@ export const useRegister = () => {
 export const useProfile = () => {
   const setUser = useAuthStore(store => store.setUser);
   const accessToken = useAuthStore(store => store.accessToken);
+
   return useQuery({
     queryKey: ['me'],
-    queryFn: () => getMe(),
+    queryFn: getMe,
     enabled: !!accessToken,
     onSuccess: data => {
-      console.log('ME FETCHED:', data);
-
+      console.log('user data from /me', data);
       setUser(data);
     },
     onError: err => {
       console.error('ME ERROR:', err.response?.data || err.message);
+    },
+    onSettled: (data, error) => {
+      console.log('ME settled data:', data);
+      console.log('ME settled error:', error);
     },
   });
 };

@@ -31,6 +31,10 @@ api.interceptors.response.use(
     console.log('AXIOS ERROR:', error);
     console.log('Original request:', originalRequest);
 
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+
     // 🚫 Prevent infinite loop on the refresh-token request
     if (originalRequest?.url?.includes('/auth/refresh-token')) {
       return Promise.reject(error);

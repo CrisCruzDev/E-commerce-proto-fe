@@ -8,11 +8,10 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
 
-      setUser: user => set({ user }),
       setToken: accessToken => set({ accessToken }),
-
+      setUser: user => set({ user }),
       logout: async () => {
-        const hasToken = useAuthStore.getState().accessToken;
+        const hasToken = get().accessToken;
 
         if (hasToken) {
           try {
@@ -22,7 +21,6 @@ export const useAuthStore = create(
           }
         }
 
-        //clear frontend
         set({ user: null, accessToken: null });
       },
     }),

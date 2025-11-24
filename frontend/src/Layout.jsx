@@ -1,6 +1,6 @@
-import Navbar from './components/navbar'
-import Footer from './components/footer'
-import { Outlet } from 'react-router-dom'
+import Navbar from './components/navbar';
+import Footer from './components/footer';
+import { Outlet } from 'react-router-dom';
 
 export default function Layout() {
   return (
@@ -9,5 +9,5 @@ export default function Layout() {
       <Outlet /> {/* renders nested routes */}
       <Footer />
     </>
-  )
+  );
 }

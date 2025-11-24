@@ -1,28 +1,36 @@
 export const apiHandler = async apiCall => {
   try {
+    // ⚠️ MOST IMPORTANT: return the axios promise
     const response = await apiCall();
-    return response.data?.data || response.data; // normalize structure
+
+    // Normalize backend formats
+    // Supports both:
+    // { data: {...} }
+    // { ... }
+    return response.data?.data ?? response.data;
   } catch (error) {
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    if (error.response?.status === 401) {
-      throw new Error('Unauthorized — please log in again');
-    }
-    if (error.response?.status === 403) {
-      throw new Error('You do not have permission for this action');
-    }
-    // NEW: catch cases where response is missing
+    // Network / CORS / server offline
     if (!error.response) {
       throw new Error(
-        `Network error — backend not reached. Possible causes:
+        `Network error — backend unreachable. Possible causes:
 - CORS blocked
 - Server offline
 - Wrong URL (${error.config?.url})
-- HTTPS/HTTP mismatch
-`
+- HTTPS/HTTP mismatch`
       );
     }
-    throw new Error('Server error or network issue');
+
+    const status = error.response.status;
+
+    // Custom backend message
+    const message = error.response.data?.message;
+
+    if (message) throw new Error(message);
+
+    if (status === 401) throw new Error('Unauthorized — please log in again');
+    if (status === 403) throw new Error('Forbidden — no permission');
+
+    // Fallback
+    throw new Error('Unexpected server error');
   }
 };

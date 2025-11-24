@@ -1,144 +1,164 @@
-import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { CiShoppingCart } from 'react-icons/ci'
-import { HiMenu, HiX } from 'react-icons/hi' // New icons for the hamburger menu
-import { LogoSvg } from './LogoSvg'
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { CiShoppingCart } from 'react-icons/ci';
+import { HiMenu, HiX } from 'react-icons/hi';
+import { LogoSvg } from './LogoSvg';
+import { useAuthStore } from '../store/auth';
 
 const Navbar = () => {
-  const location = useLocation()
-  const [isOpen, setIsOpen] = useState(false) // New state for mobile menu
+  const user = useAuthStore(s => s.user);
+  console.log('Navbar: user', user);
+  const showSwitch = user?.role === 'user';
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
-  // New useEffect hook to handle body overflow when the menu is open
+  // Close menu when route OR hash changes
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
+    setIsOpen(false);
+  }, [location.pathname, location.hash]);
+
+  // Scroll to section if hash exists after navigation
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
-    return () => {
-      document.body.style.overflow = 'unset'
+  }, [location.hash]);
+
+  const handleSmoothNav = path => {
+    const [base, hash] = path.split('#');
+
+    // If navigating within homepage sections
+    if (location.pathname === base) {
+      if (hash) {
+        const el = document.getElementById(hash);
+        el?.scrollIntoView({ behavior: 'smooth' });
+      }
+      navigate(path);
+      return;
     }
-  }, [isOpen])
+
+    // If coming from another page (ex: /create → #product-section)
+    navigate(path);
+  };
 
   const navLinks = [
     { name: 'Products', path: '/#product-section' },
     { name: 'Add product', path: '/create' },
-  ]
+  ];
 
-  const activeColor = 'text-[rgba(255,70,57,1)]'
-  const inactiveColor = 'text-black'
+  const isLinkActive = path => {
+    const [base, hash] = path.split('#');
+    if (location.pathname !== base) return false;
+    if (hash && location.hash !== `#${hash}`) return false;
+    return true;
+  };
 
   return (
-    <nav className='sticky top-0 w-full h-20 z-40 bg-white backdrop-blur-lg border-b-[0.5px] border-gray-200'>
-      <div className='h-full w-full px-4 sm:px-6 lg:px-8'>
-        <div className='h-full flex justify-between items-center'>
-          <Link to='/' className='flex items-center h-full'>
+    <>
+      {/* FULL-WIDTH SWITCH BAR */}
+      {showSwitch && (
+        <button
+          onClick={() => console.log('switch')}
+          className='
+            w-full 
+            bg-black text-white 
+            py-2 
+            text-center 
+            text-sm 
+            font-medium 
+            hover:bg-black/90 
+            transition
+          '
+        >
+          Switch to Admin
+        </button>
+      )}
+      <nav className='sticky top-0 z-40 bg-white h-20 border-b border-gray-200'>
+        <div className='h-full flex items-center justify-between px-6'>
+          {/* LOGO */}
+          <Link
+            to='/'
+            onClick={e => {
+              if (location.pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+              navigate('/');
+            }}
+            className='flex items-center h-full'
+          >
             <LogoSvg />
           </Link>
 
-          {/* Desktop/Tablet Navigation - Hidden on small screens */}
-          <div className='h-full hidden md:flex items-center space-x-8 flex-grow justify-center'>
-            {navLinks.map((link) => {
-              const isHashLink = link.path.includes('#')
-              const linkPath = link.path.split('#')[0]
-              const isActive = location.pathname === linkPath
+          {/* DESKTOP */}
+          <div className='hidden md:flex space-x-10'>
+            {navLinks.map(link => {
+              const active = isLinkActive(link.path);
 
               return (
-                <Link
+                <button
                   key={link.name}
-                  to={link.path}
-                  onClick={(e) => {
-                    if (
-                      isHashLink &&
-                      location.pathname === linkPath &&
-                      location.hash === '#product-section'
-                    ) {
-                      e.preventDefault()
-                      const el = document.getElementById('product-section')
-                      el?.scrollIntoView({ behavior: 'smooth' })
-                    }
-                  }}
-                  className={`h-full flex items-center relative transition-all duration-100 group hover:text-black ${
-                    isActive
-                      ? 'text-[rgba(255,70,57,1)] scale-105'
-                      : 'text-black/50'
+                  onClick={() => handleSmoothNav(link.path)}
+                  className={`relative transition-all duration-200 cursor-pointer ${
+                    active ? 'text-red-500 scale-105' : 'text-black/60'
                   }`}
                 >
                   {link.name}
+
                   <span
-                    className={`absolute bottom-0.5 left-0 h-[2px] bg-[rgba(255,48,34,1)] ${
-                      isActive ? 'w-full' : 'w-0'
+                    className={`absolute left-0 -bottom-1 h-[2px] bg-red-500 transition-all duration-200 ${
+                      active ? 'w-full' : 'w-0'
                     }`}
-                  ></span>
-                </Link>
-              )
+                  />
+                </button>
+              );
             })}
           </div>
 
-          <div className='flex items-center space-x-3'>
+          {/* RIGHT SIDE */}
+          <div className='flex items-center space-x-4'>
             <Link to='/cart'>
               <CiShoppingCart
                 className={`w-7 h-7 ${
-                  location.pathname === '/cart' ? activeColor : inactiveColor
+                  location.pathname === '/cart' ? 'text-red-500' : 'text-black'
                 }`}
               />
             </Link>
 
-            {/* Hamburger Icon for Mobile - Visible on small screens */}
-            <div className='flex md:hidden'>
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                type='button'
-                className='inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-black'
-                aria-controls='mobile-menu'
-                aria-expanded={isOpen}
-              >
-                <span className='sr-only'>Open main menu</span>
-                {isOpen ? (
-                  <HiX
-                    className='block h-6 w-6 text-[#FF4639]'
-                    aria-hidden='true'
-                  />
-                ) : (
-                  <HiMenu
-                    className='block h-6 w-6 text-[#FF4639]'
-                    aria-hidden='true'
-                  />
-                )}
-              </button>
-            </div>
+            <button
+              className='md:hidden text-red-500'
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <HiX size={30} /> : <HiMenu size={30} />}
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu Content - Hidden by default, toggles on click */}
-      <div
-        className={`${
-          isOpen ? 'fixed inset-0 pt-20 h-screen md:hidden' : 'hidden'
-        }`}
-      >
-        <div className='flex flex-col items-center justify-center h-full bg-gray-800/50 backdrop-blur-2xl px-2 pt-15 pb-3 space-y-1'>
-          {navLinks.map((link) => {
-            const isActive = location.pathname === link.path
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setIsOpen(false)} // Close menu on click
-                className={`block py-10 text-5xl font-thin ${
-                  isActive
-                    ? 'font-medium border-b-2 border-white text-white'
-                    : 'text-gray-500'
-                }`}
-              >
-                {link.name}
-              </Link>
-            )
-          })}
-        </div>
-      </div>
-    </nav>
-  )
-}
+        {/* MOBILE MENU */}
+        {isOpen && (
+          <div className='md:hidden fixed top-20 left-0 w-full h-[calc(100vh-5rem)] bg-black/80 backdrop-blur-md flex flex-col items-center pt-10 space-y-12'>
+            {navLinks.map(link => {
+              const active = isLinkActive(link.path);
 
-export default Navbar
+              return (
+                <button
+                  key={link.name}
+                  onClick={() => handleSmoothNav(link.path)}
+                  className={`text-4xl ${
+                    active ? 'text-white font-medium' : 'text-white/70'
+                  }`}
+                >
+                  {link.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </nav>
+    </>
+  );
+};
+export default Navbar;
