@@ -69,15 +69,17 @@ export const useRegister = () => {
 export const useProfile = () => {
   const setUser = useAuthStore(store => store.setUser);
   const accessToken = useAuthStore(store => store.accessToken);
+  const user = useAuthStore(store => store.user);
 
   return useQuery({
     queryKey: ['me'],
-    queryFn: getMe,
-    enabled: !!accessToken,
-    onSuccess: data => {
-      console.log('user data from /me', data);
-      setUser(data);
+    queryFn: async () => {
+      const res = await getMe();
+      console.log('query result:', res);
+      setUser(res);
+      return res;
     },
+    enabled: !!accessToken,
     onError: err => {
       console.error('ME ERROR:', err.response?.data || err.message);
     },

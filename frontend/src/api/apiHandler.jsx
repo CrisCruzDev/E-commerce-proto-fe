@@ -1,12 +1,6 @@
 export const apiHandler = async apiCall => {
   try {
-    // ⚠️ MOST IMPORTANT: return the axios promise
     const response = await apiCall();
-
-    // Normalize backend formats
-    // Supports both:
-    // { data: {...} }
-    // { ... }
     return response.data?.data ?? response.data;
   } catch (error) {
     // Network / CORS / server offline

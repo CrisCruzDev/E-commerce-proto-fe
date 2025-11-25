@@ -7,7 +7,6 @@ import { useAuthStore } from '../store/auth';
 
 const Navbar = () => {
   const user = useAuthStore(s => s.user);
-  console.log('Navbar: user', user);
   const showSwitch = user?.role === 'user';
   const location = useLocation();
   const navigate = useNavigate();

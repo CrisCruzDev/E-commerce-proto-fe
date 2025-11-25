@@ -22,4 +22,6 @@ export const verifyAdminKey = async ({ email, adminKey }) => {
     api.post('/admin/verify-admin-key', { email, adminKey })
   );
 };
-export const getMe = () => apiHandler(() => api.get('/auth/me'));
+export const getMe = async () => {
+  return apiHandler(() => api.get('/auth/me'));
+};
