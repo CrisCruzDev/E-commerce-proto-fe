@@ -57,20 +57,11 @@ const Navbar = () => {
 
   return (
     <>
-      {/* FULL-WIDTH SWITCH BAR */}
+      {/* SWITCH BAR */}
       {showSwitch && (
         <button
           onClick={() => console.log('switch')}
-          className='
-            w-full 
-            bg-black text-white 
-            py-2 
-            text-center 
-            text-sm 
-            font-medium 
-            hover:bg-black/90 
-            transition
-          '
+          className='py-1 w-full bg-black cursor-pointer text-white text-center text-sm font-medium hover:bg-black/90 transition'
         >
           Switch to Admin
         </button>

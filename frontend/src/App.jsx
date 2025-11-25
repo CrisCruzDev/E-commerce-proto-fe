@@ -7,6 +7,7 @@ import ProductDetails from './pages/ProductDetails';
 import EditProductPage from './pages/EditProductPage';
 import { AuthPage } from './pages/AuthPage';
 import ProtectedRoute from './ProtectedRoute';
+import AdminRoute from './AdminRoute';
 
 function App() {
   return (
@@ -24,10 +25,26 @@ function App() {
         }
       >
         <Route path='/' element={<HomePage />} />
-        <Route path='/create' element={<CreatePage />} />
         <Route path='/cart' element={<CartPage />} />
         <Route path='/product/:id' element={<ProductDetails />} />
-        <Route path='/edit/:id' element={<EditProductPage />} />
+        {/* ADMIN ONLY ROUTES */}
+        <Route
+          path='/create'
+          element={
+            <AdminRoute>
+              <CreatePage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path='/edit/:id'
+          element={
+            <AdminRoute>
+              <EditProductPage />
+            </AdminRoute>
+          }
+        />
       </Route>
 
       {/* Catch-all redirect */}
