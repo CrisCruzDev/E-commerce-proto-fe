@@ -129,7 +129,7 @@ const Navbar = () => {
 
         {/* MOBILE MENU */}
         {isOpen && (
-          <div className='md:hidden fixed top-20 left-0 w-full h-[calc(100vh-5rem)] bg-black/80 backdrop-blur-md flex flex-col items-center pt-10 space-y-12'>
+          <div className='md:hidden fixed top-25 left-0 w-full h-[calc(100vh-5rem)] bg-black/80 backdrop-blur-md flex flex-col items-center pt-20 space-y-12'>
             {navLinks.map(link => {
               const active = isLinkActive(link.path);
 
