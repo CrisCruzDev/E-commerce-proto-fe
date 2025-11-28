@@ -4,19 +4,11 @@ import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 
 export default function AdminRoute({ children }) {
-  const user = useAuthStore(store => store.user);
-  const [denied, setDenied] = useState(false);
+  const user = useAuthStore(s => s.user);
 
-  if (!user) return <Navigate to='/login' />;
+  if (!user) return <Navigate to='/login' replace />;
 
-  useEffect(() => {
-    if (user && user.role !== 'admin') {
-      toast.error('Access denied. Admin only.', { id: 'admin-denied' });
-      setDenied(true);
-    }
-  }, [user]);
-
-  if (denied) return <Navigate to='/' replace />;
+  if (user.role !== 'admin') return <Navigate to='/' replace />;
 
   return children;
 }

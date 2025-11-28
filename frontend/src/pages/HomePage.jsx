@@ -3,24 +3,28 @@ import { getProducts } from '../api/productApi';
 import { useQuery } from '@tanstack/react-query';
 import blur from '../assets/blur.png';
 import toast from 'react-hot-toast';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useUIStore } from '../store/ui';
 
 const HomePage = () => {
-  const productSectionRef = useRef(null); // <== Step 1
+  const productRef = useRef(null);
+  const scrollTo = useUIStore(s => s.scrollTo);
+  const consumeScrollTo = useUIStore(s => s.consumeScrollTo);
+
   const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   const handleShopNowClick = () => {
-    productSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    productRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // // Handle scrolling from navbar using hash
-  // useEffect(() => {
-  //   if (location.hash === '#product-section') {
-  //     setTimeout(() => {
-  //       productSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-  //     }, 0);
-  //   }
-  // }, [location]);
+  useLayoutEffect(() => {
+    if (!scrollTo) return;
+
+    if (scrollTo === 'product-section' && productRef.current) {
+      productRef.current.scrollIntoView({ behavior: 'smooth' });
+      consumeScrollTo();
+    }
+  }, [scrollTo]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -120,22 +124,17 @@ const HomePage = () => {
     <div className='min-h-screen text-gray-800'>
       {/* Hero Section */}
       <section className='relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden'>
-        <div
-          className='py-20 absolute inset-0 bg-cover bg-center -z-20'
-          style={isLargeScreen ? { backgroundImage: `url(${blur})` } : {}}
-        >
-          {/* Updated centering container */}
-          <div className='flex justify-center'>
-            <div className='w-full max-w-7xl grid grid-cols-2 sm:grid-cols-4 gap-x-8 md:gap-x-16 gap-y-16 justify-items-center items-center text-[#82b4a5]'>
-              {brands.map((brand, index) => (
-                <div key={index} className='w-full flex justify-center'>
-                  <div
-                    className='w-12 h-12 flex items-center justify-center opacity-50'
-                    dangerouslySetInnerHTML={{ __html: brand.svg }}
-                  />
-                </div>
-              ))}
-            </div>
+        {/* Center Grid */}
+        <div className='flex justify-center w-full'>
+          <div className='w-full max-w-7xl grid grid-cols-2 sm:grid-cols-4 gap-x-8 md:gap-x-16 gap-y-16 justify-items-center items-center text-[#82b4a5]'>
+            {brands.map((brand, index) => (
+              <div key={index} className='w-full flex justify-center'>
+                <div
+                  className='w-12 h-12 flex items-center justify-center opacity-50'
+                  dangerouslySetInnerHTML={{ __html: brand.svg }}
+                />
+              </div>
+            ))}
           </div>
         </div>
         {/* <h1 className='flex z-40 !text-7xl md:text-7xl text-black !font-thin text-center tracking-wide'>
@@ -171,7 +170,7 @@ const HomePage = () => {
         </div>
 
         <div
-          ref={productSectionRef}
+          ref={productRef}
           id='product-section'
           className='py-30 max-w-7xl mx-auto px-2 sm:px-6 lg:px-8'
         >

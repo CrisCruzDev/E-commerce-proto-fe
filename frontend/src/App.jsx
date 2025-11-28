@@ -8,6 +8,7 @@ import EditProductPage from './pages/EditProductPage';
 import { AuthPage } from './pages/AuthPage';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
+import ScrollToTop from './ScrollToTop';
 
 function App() {
   return (

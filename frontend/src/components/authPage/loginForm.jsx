@@ -1,14 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { loginUser } from '../../api/authApi';
+import { Link } from 'react-router-dom';
 import { LogoSvg } from '../LogoSvg';
-import { useAuthStore } from '../../store/auth';
-import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLogin } from '../../hooks/useAuth';
 
 export const LoginCard = ({ userData, setUserData }) => {
-  const navigate = useNavigate();
   const loginMutation = useLogin({
     onError: () => {
       setUserData(prev => ({ ...prev, password: '' }));

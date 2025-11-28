@@ -14,12 +14,12 @@ export const logoutUser = async () => {
 };
 
 export const requestAdminKey = async email => {
-  return apiHandler(() => api.post('/admin/request-admin-key', { email }));
+  return apiHandler(() => api.post('/auth/request-admin-key', { email }));
 };
 
 export const verifyAdminKey = async ({ email, adminKey }) => {
   return apiHandler(() =>
-    api.post('/admin/verify-admin-key', { email, adminKey })
+    api.post('/auth/verify-admin-key', { email, adminKey })
   );
 };
 export const getMe = async () => {

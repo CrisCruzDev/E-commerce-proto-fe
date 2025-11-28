@@ -4,52 +4,49 @@ import { CiShoppingCart } from 'react-icons/ci';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { LogoSvg } from './LogoSvg';
 import { useAuthStore } from '../store/auth';
+import { useUIStore } from '../store/ui';
+import toast from 'react-hot-toast';
+import RequestAdminKeyModal from './adminKeyModal/RequestAdminKeyModal';
 
 const Navbar = () => {
   const user = useAuthStore(s => s.user);
+  const mobileOpen = useUIStore(s => s.mobileOpen);
+  const setMobileOpen = useUIStore(s => s.setMobileOpen);
+  const setScrollTo = useUIStore(s => s.setScrollTo);
+  const openRequestKey = useUIStore(s => s.openRequestKey);
   const showSwitch = user?.role === 'user';
+  const isAdmin = user?.role === 'admin';
+
   const location = useLocation();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
 
   // Close menu when route OR hash changes
   useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname, location.hash]);
-
-  // Scroll to section if hash exists after navigation
-  useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace('#', '');
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [location.hash]);
+    setMobileOpen(false);
+  }, [location.pathname, location.hash, setMobileOpen]);
 
   const handleSmoothNav = path => {
     const [base, hash] = path.split('#');
 
-    // If navigating within homepage sections
-    if (location.pathname === base) {
-      if (hash) {
-        const el = document.getElementById(hash);
-        el?.scrollIntoView({ behavior: 'smooth' });
-      }
-      navigate(path);
+    // If going to a section on the current page
+    if (location.pathname === base && hash) {
+      setScrollTo(hash); // trigger actual scroll
+      navigate(`${base}#${hash}`); // update URL so nav highlight works
       return;
     }
 
-    // If coming from another page (ex: /create → #product-section)
+    // Normal navigation
     navigate(path);
   };
 
   const navLinks = [
     { name: 'Products', path: '/#product-section' },
-    { name: 'Add product', path: '/create' },
+    { name: 'Add product', path: '/create', adminOnly: true },
   ];
 
   const isLinkActive = path => {
     const [base, hash] = path.split('#');
+
     if (location.pathname !== base) return false;
     if (hash && location.hash !== `#${hash}`) return false;
     return true;
@@ -60,7 +57,7 @@ const Navbar = () => {
       {/* SWITCH BAR */}
       {showSwitch && (
         <button
-          onClick={() => console.log('switch')}
+          onClick={openRequestKey}
           className='py-1 w-full bg-black cursor-pointer text-white text-center text-sm font-medium hover:bg-black/90 transition'
         >
           Switch to Admin
@@ -75,8 +72,9 @@ const Navbar = () => {
               if (location.pathname === '/') {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                navigate('/');
               }
-              navigate('/');
             }}
             className='flex items-center h-full'
           >
@@ -87,6 +85,24 @@ const Navbar = () => {
           <div className='hidden md:flex space-x-10'>
             {navLinks.map(link => {
               const active = isLinkActive(link.path);
+              const disabled = link.adminOnly && !isAdmin;
+
+              if (disabled) {
+                return (
+                  <div key={link.name} className='relative group inline-block'>
+                    <button
+                      disabled
+                      className='relative text-black/30 cursor-not-allowed'
+                    >
+                      {link.name}
+                    </button>
+                    {/* Tooltip */}
+                    <div className='absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block whitespace-nowrap bg-gray-900 text-white text-sm px-3 py-1 rounded-md shadow-lg z-20'>
+                      You must be an admin to access this.
+                    </div>
+                  </div>
+                );
+              }
 
               return (
                 <button
@@ -120,23 +136,43 @@ const Navbar = () => {
 
             <button
               className='md:hidden text-red-500'
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setMobileOpen(!mobileOpen)}
             >
-              {isOpen ? <HiX size={30} /> : <HiMenu size={30} />}
+              {mobileOpen ? <HiX size={30} /> : <HiMenu size={30} />}
             </button>
           </div>
         </div>
 
         {/* MOBILE MENU */}
-        {isOpen && (
+        {mobileOpen && (
           <div className='md:hidden fixed top-25 left-0 w-full h-[calc(100vh-5rem)] bg-black/80 backdrop-blur-md flex flex-col items-center pt-20 space-y-12'>
             {navLinks.map(link => {
               const active = isLinkActive(link.path);
+              const disabled = link.adminOnly && !isAdmin;
+
+              if (disabled) {
+                return (
+                  <button
+                    key={link.name}
+                    title='Admin only'
+                    className='text-white/40 text-4xl cursor-not-allowed'
+                    onClick={() => {
+                      toast.error('You must be an admin to add products');
+                      setMobileOpen(false);
+                    }}
+                  >
+                    {link.name}
+                  </button>
+                );
+              }
 
               return (
                 <button
                   key={link.name}
-                  onClick={() => handleSmoothNav(link.path)}
+                  onClick={() => {
+                    handleSmoothNav(link.path);
+                    setMobileOpen(false);
+                  }}
                   className={`text-4xl ${
                     active ? 'text-white font-medium' : 'text-white/70'
                   }`}

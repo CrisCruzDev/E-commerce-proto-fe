@@ -4,6 +4,7 @@ import {
   loginUser,
   registerUser,
   requestAdminKey,
+  verifyAdminKey,
 } from '../api/authApi';
 import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
@@ -13,6 +14,7 @@ export const useLogin = () => {
   const navigate = useNavigate();
 
   const setToken = useAuthStore(store => store.setToken);
+
   return useMutation({
     mutationFn: loginUser,
     onSuccess: data => {
@@ -41,6 +43,7 @@ export const useLogin = () => {
 };
 export const useRegister = () => {
   const setToken = useAuthStore(store => store.setToken);
+
   return useMutation({
     mutationFn: registerUser,
     onSuccess: data => {
@@ -97,6 +100,27 @@ export const useRequestAdminKey = () => {
     },
     onError: err => {
       console.error('ADMIN REQUEST ERROR:', err.response?.data || err.message);
+    },
+  });
+};
+
+export const useVerifyAdminKey = () => {
+  const setUser = useAuthStore(store => store.setUser);
+
+  return useMutation({
+    mutationFn: verifyAdminKey,
+    onSuccess: user => {
+      console.log('ADMIN KEY VERIFIED:', user);
+      setUser(prev => ({
+        ...prev,
+        ...user,
+      }));
+    },
+    onError: err => {
+      console.error(
+        'ADMIN KEY VERIFICATION ERROR:',
+        err.response?.data || err.message
+      );
     },
   });
 };
