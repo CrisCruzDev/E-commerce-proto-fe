@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/auth';
 import { useState } from 'react';
 
 const AdminKeyInputModal = ({ isOpen, onClose }) => {
-  const user = useAuthStore(state => state.user);
+  const user = useAuthStore(s => s.user);
   const verifyMutation = useVerifyAdminKey();
 
   const [keyInput, setKeyInput] = useState('');

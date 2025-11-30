@@ -1,7 +1,7 @@
 export const apiHandler = async apiCall => {
   try {
     const response = await apiCall();
-    return response.data?.data ?? response.data;
+    return response.data;
   } catch (error) {
     // Network / CORS / server offline
     if (!error.response) {

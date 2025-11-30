@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { registerUser } from '../../api/authApi';
 import { Link } from 'react-router-dom';
-import { LogoSvg } from '../LogoSvg';
+import { LogoSvg } from '../svg/LogoSvg';
 import { useAuthStore } from '../../store/auth';
 import toast from 'react-hot-toast';
 import { useRegister } from '../../hooks/useAuth';

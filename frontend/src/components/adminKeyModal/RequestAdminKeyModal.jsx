@@ -4,7 +4,7 @@ import { useUIStore } from '../../store/ui';
 import { useAuthStore } from '../../store/auth';
 
 const RequestAdminKeyModal = ({ isOpen, onClose }) => {
-  const user = useAuthStore(state => state.user);
+  const user = useAuthStore(s => s.user);
   const openVerifyKey = useUIStore(s => s.openVerifyKey);
   const requestAdminKey = useRequestAdminKey();
 

@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CiShoppingCart } from 'react-icons/ci';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { LogoSvg } from './LogoSvg';
+
 import { useAuthStore } from '../store/auth';
 import { useUIStore } from '../store/ui';
 import toast from 'react-hot-toast';
 import RequestAdminKeyModal from './adminKeyModal/RequestAdminKeyModal';
+import { LogoSvg } from './svg/LogoSvg';
 
 const Navbar = () => {
   const user = useAuthStore(s => s.user);

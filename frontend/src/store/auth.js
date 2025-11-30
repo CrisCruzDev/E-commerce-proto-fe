@@ -8,8 +8,16 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
 
-      setToken: accessToken => set({ accessToken }),
+      // unified setter: pass { user, accessToken } or partial
+      setAuth: ({ user, accessToken }) =>
+        set(state => ({
+          user: user ?? state.user,
+          accessToken: accessToken ?? state.accessToken,
+        })),
+
       setUser: user => set({ user }),
+      setToken: accessToken => set({ accessToken }),
+
       logout: async () => {
         const hasToken = get().accessToken;
 

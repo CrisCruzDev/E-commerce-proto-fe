@@ -1,4 +1,9 @@
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   getMe,
   loginUser,
@@ -12,8 +17,9 @@ import { useNavigate } from 'react-router-dom';
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const setToken = useAuthStore(store => store.setToken);
+  const setToken = useAuthStore(s => s.setToken);
 
   return useMutation({
     mutationFn: loginUser,
@@ -24,6 +30,7 @@ export const useLogin = () => {
       }
 
       setToken(data?.accessToken);
+      queryClient.invalidateQueries(['me']);
       navigate('/');
     },
     onError: err => {
@@ -42,7 +49,10 @@ export const useLogin = () => {
   });
 };
 export const useRegister = () => {
-  const setToken = useAuthStore(store => store.setToken);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const setToken = useAuthStore(s => s.setToken);
 
   return useMutation({
     mutationFn: registerUser,
@@ -54,7 +64,7 @@ export const useRegister = () => {
         return;
       }
       setToken(data?.accessToken);
-      toast.success('Logging in...');
+      queryClient.invalidateQueries(['me']);
       navigate('/');
     },
     onError: err => {
@@ -70,17 +80,16 @@ export const useRegister = () => {
   });
 };
 export const useProfile = () => {
-  const setUser = useAuthStore(store => store.setUser);
-  const accessToken = useAuthStore(store => store.accessToken);
-  const user = useAuthStore(store => store.user);
+  const setUser = useAuthStore(s => s.setUser);
+  const accessToken = useAuthStore(s => s.accessToken);
 
   return useQuery({
     queryKey: ['me'],
     queryFn: async () => {
       const res = await getMe();
       console.log('query result:', res);
-      setUser(res);
-      return res;
+      setUser(res.data);
+      return res.data;
     },
     enabled: !!accessToken,
     onError: err => {
@@ -103,18 +112,18 @@ export const useRequestAdminKey = () => {
     },
   });
 };
-
 export const useVerifyAdminKey = () => {
-  const setUser = useAuthStore(store => store.setUser);
+  const queryClient = useQueryClient();
+
+  const setToken = useAuthStore(s => s.setToken);
 
   return useMutation({
     mutationFn: verifyAdminKey,
-    onSuccess: user => {
-      console.log('ADMIN KEY VERIFIED:', user);
-      setUser(prev => ({
-        ...prev,
-        ...user,
-      }));
+    onSuccess: res => {
+      console.log('ADMIN KEY VERIFIED:', res);
+      setToken(res.accessToken);
+      queryClient.invalidateQueries(['me']);
+      toast.success(res.message || 'Admin privileges granted');
     },
     onError: err => {
       console.error(

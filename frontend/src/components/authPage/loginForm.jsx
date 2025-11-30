@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LogoSvg } from '../LogoSvg';
+import { LogoSvg } from '../svg/LogoSvg';
 import toast from 'react-hot-toast';
 import { useLogin } from '../../hooks/useAuth';
 
