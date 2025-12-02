@@ -20,7 +20,6 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
       { email: user.email, adminKey: keyInput },
       {
         onSuccess: () => {
-          toast.success('Admin key verified! You are now an admin.');
           onClose();
         },
         onError: err => {
@@ -34,15 +33,34 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
 
   return (
     <div className='fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50'>
-      <div className='bg-white rounded-lg p-6 w-[90%] max-w-md shadow-lg'>
-        <h2 className='text-xl font-semibold mb-3'>Enter Admin Key</h2>
+      <div className='bg-white rounded-xl p-6 w-[90%] max-w-md shadow-xl border border-gray-200 animate-fadeIn'>
+        {/* Success Notice */}
+        <div className='flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-5'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='w-6 h-6'
+            fill='none'
+            viewBox='0 0 24 24'
+            strokeWidth={2}
+            stroke='currentColor'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M4.5 12.75l6 6 9-13.5'
+            />
+          </svg>
+          <p className='font-medium text-green-700'>
+            Admin key sent successfully!
+          </p>
+        </div>
 
-        <p className='text-gray-600'>An admin verification key was sent to:</p>
-
-        <p className='font-medium mt-1 mb-4'>{user?.email}</p>
-
-        <p className='text-gray-500 text-sm mb-4'>
-          Enter the key below to become an admin.
+        {/* Title */}
+        <p className='text-gray-600 mb-6'>
+          A verification key was sent to: {user?.email}
+        </p>
+        <p className='text-sm mb-4 font-medium'>
+          Enter the key below to confirm your admin status:
         </p>
 
         {/* Input */}
@@ -51,7 +69,7 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
           value={keyInput}
           onChange={e => setKeyInput(e.target.value)}
           placeholder='Enter admin key'
-          className='w-full border px-3 py-2 rounded outline-none focus:ring-2 focus:ring-black'
+          className='w-full border px-3 py-2 rounded outline-none focus:ring-2 focus:ring-black/80 transition'
         />
 
         {/* Buttons */}
