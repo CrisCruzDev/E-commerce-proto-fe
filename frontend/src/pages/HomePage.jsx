@@ -178,7 +178,7 @@ const HomePage = () => {
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-5 md:gap-y-10 gap-x-5 md:gap-x-20'>
               {products.map(product => (
                 <div key={product._id} className='flex justify-center'>
-                  <ProductCard product={product} />
+                  <ProductCard productData={product} />
                 </div>
               ))}
             </div>

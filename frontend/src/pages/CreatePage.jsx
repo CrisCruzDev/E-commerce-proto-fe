@@ -12,17 +12,22 @@ import { useProductStore } from '../store/product';
 const CreatePage = ({ isEditMode = false }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { product: productToEdit, setUpdateProduct } = useProductStore();
+  const { productToEdit, clearProductToEdit } = useProductStore();
 
   const [productFormData, setProductFormData] = useState({
     name: '',
     price: '',
     image: '',
+    imagePublicId: '',
     description: '',
     category: '',
     brand: '',
     stock: '',
   });
+
+  useEffect(() => {
+    if (!isEditMode) clearProductToEdit();
+  }, [isEditMode]);
 
   useEffect(() => {
     if (isEditMode && productToEdit) {
@@ -31,8 +36,6 @@ const CreatePage = ({ isEditMode = false }) => {
   }, [isEditMode, productToEdit]);
 
   console.log('Loaded product from store:', productToEdit);
-  console.log('image product from store:', productToEdit.image);
-  console.log('image form data:', productFormData.image);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [validationErrors, setValidationErrors] = useState({});
@@ -67,7 +70,6 @@ const CreatePage = ({ isEditMode = false }) => {
       await queryClient.cancelQueries({ queryKey: ['products'] });
     },
     onSuccess: (data, variables) => {
-      setUpdateProduct(data);
       queryClient.setQueryData(['getProductById', data._id], data);
       queryClient.invalidateQueries(['products']);
       console.log(data.message);
@@ -86,7 +88,6 @@ const CreatePage = ({ isEditMode = false }) => {
       return await updateProduct({ id, product });
     },
     onSuccess: updatedProduct => {
-      setUpdateProduct(updatedProduct);
       queryClient.setQueryData(
         ['getProductById', updatedProduct._id],
         updatedProduct

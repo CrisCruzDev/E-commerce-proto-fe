@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react';
+import { uploadToCloudinary } from '../../services/uploadService';
+import imageCompression from 'browser-image-compression';
 
 export const ProductInfoStep = ({
   formData,
@@ -7,68 +9,92 @@ export const ProductInfoStep = ({
   validationErrors,
   isSubmitting,
 }) => {
-  const [imageFile, setImageFile] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
+  const [isDragging, setIsDragging] = useState(false);
+  const [error, setError] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const fileInputRef = useRef(null)
+  const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    if (formData.image && typeof formData.image === 'string') {
-      setImageFile(formData.image)
+  const handleFileUpload = async file => {
+    setError(null);
+    setIsUploading(true);
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setIsUploading(false);
+      return setError('Only image files are allowed.');
     }
-  }, [formData.image])
 
-  const handleFile = (file) => {
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setImageFile(reader.result)
-      onFormChange({ image: reader.result })
+    // Validate file size BEFORE compression
+    if (file.size > 8 * 1024 * 1024) {
+      setIsUploading(false);
+      return setError('Image is too large. Max allowed is 8MB.');
     }
-    reader.readAsDataURL(file)
-  }
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      handleFile(file)
-    } else {
-      // --- FIX: If drop is invalid/cleared, ensure imageUrl is an empty string ---
-      setImageFile(null)
-      onFormChange({ image: '' })
+    try {
+      // Compress the file before upload
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 1, // target 1MB
+        maxWidthOrHeight: 1000,
+        useWebWorker: true,
+      });
+
+      // Upload to Cloudinary via backend
+      const { url, publicId } = await uploadToCloudinary(compressed);
+
+      // Update form data (single source of truth)
+      onFormChange({ image: url, imagePublicId: publicId });
+
+      // Reset input value (so the same file can be selected again)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
+    } catch (err) {
+      console.error('Image upload error:', err);
+    } finally {
+      setIsUploading(false);
     }
-  }
+  };
 
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(true)
-  }
+  const handleFileChange = e => {
+    const file = e.target.files[0];
+    file ? handleFileUpload(file) : clearImage();
+  };
 
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-  }
+  const handleDragOver = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
 
-  const handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    const file = e.dataTransfer.files[0]
-    if (file) {
-      handleFile(file)
-    }
-  }
+  const handleDragLeave = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    onFormChange({ [name]: value })
-  }
+  const handleDrop = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    file ? handleFileUpload(file) : clearImage();
+  };
 
   const clearImage = () => {
-    setImageFile(null)
-    onFormChange({ image: '' })
-  }
+    onFormChange({ image: '', imagePublicId: '' });
+
+    // Reset input value (so the same file can be selected again)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
+  };
+
+  const handleInputChange = e => {
+    const { name, value } = e.target;
+    onFormChange({ [name]: value });
+  };
 
   return (
     <>
@@ -80,6 +106,8 @@ export const ProductInfoStep = ({
         >
           Image
         </label>
+
+        {/* Dropzone */}
         <div className='flex items-center justify-center'>
           <div
             className={`relative w-full sm:w-3/4 aspect-video border-2 border-dashed flex items-center justify-center cursor-pointer hover:bg-gray-100 duration-100
@@ -91,11 +119,14 @@ export const ProductInfoStep = ({
                   ${
                     validationErrors.image ? 'border-red-300 bg-red-100/30' : ''
                   }
+                  ${isUploading ? 'pointer-events-none opacity-70' : ''}
                   `}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => document.getElementById('file-input').click()}
+            onDragOver={!isUploading ? handleDragOver : undefined}
+            onDragLeave={!isUploading ? handleDragLeave : undefined}
+            onDrop={!isUploading ? handleDrop : undefined}
+            onClick={
+              !isUploading ? () => fileInputRef.current.click() : undefined
+            }
           >
             <input
               id='file-input'
@@ -105,10 +136,15 @@ export const ProductInfoStep = ({
               accept='image/*'
               ref={fileInputRef}
             />
-            {formData.image ? (
+            {/* Image preview */}
+            {isUploading ? (
+              <div className='absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm'>
+                <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
+              </div>
+            ) : formData.image ? (
               <img
                 src={formData.image}
-                alt='Product Preview'
+                alt='Preview'
                 className='max-h-full max-w-full object-contain p-4'
               />
             ) : (
@@ -119,12 +155,18 @@ export const ProductInfoStep = ({
                 </p>
               </div>
             )}
+            {(error || validationErrors.image) && (
+              <p className='mt-2 text-sm text-red-600 text-center'>
+                {error || validationErrors.image}
+              </p>
+            )}
+
             {formData.image && (
               <button
                 type='button'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  clearImage()
+                onClick={e => {
+                  e.stopPropagation();
+                  clearImage();
                 }}
                 className='absolute top-2 right-2 p-1 bg-red-500 text-white hover:bg-red-600 text-xs cursor-pointer'
               >
@@ -141,15 +183,15 @@ export const ProductInfoStep = ({
       {/* Image URL Input */}
       <div>
         <label
-          htmlFor='imageUrl'
+          htmlFor='image'
           className='block text-sm font-medium text-gray-700 mb-2'
         >
           Image URL
         </label>
         <input
           type='text'
-          id='imageUrl'
-          name='imageUrl'
+          id='image'
+          name='image'
           className={`mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm
             ${
               validationErrors.image
@@ -232,13 +274,11 @@ export const ProductInfoStep = ({
             id='description'
             name='description'
             rows='4'
-            className='mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm'
+            className='whitespace-pre-line mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm'
             placeholder='A detailed description of the product...'
             value={formData.description || ''}
             onChange={handleInputChange}
-          >
-            <p className='whitespace-pre-line'></p>
-          </textarea>
+          ></textarea>
         </div>
 
         {/* Category Input */}
@@ -299,5 +339,5 @@ export const ProductInfoStep = ({
         </div>
       </div>
     </>
-  )
-}
+  );
+};

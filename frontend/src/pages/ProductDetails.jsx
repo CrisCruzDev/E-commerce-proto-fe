@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCartStore } from '../store/cart';
@@ -54,7 +54,13 @@ const ProductDetails = () => {
         <div className='flex flex-col md:flex-row gap-8 md:gap-16'>
           {/* Left Side: Image */}
           <div className='flex-1'>
-            <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
+            <Link
+              className='text-[12px] transition-colors cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
+              to={`/edit/${productId}`}
+            >
+              <p>Edit product &rarr;</p>
+            </Link>
+            <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25 disabled: opacity-50'>
               <img
                 src={product?.image}
                 alt='Product'
@@ -62,8 +68,8 @@ const ProductDetails = () => {
               />
               {/* SOLD OUT overlay */}
               {isOutOfStock && (
-                <div className='absolute inset-0 bg-black/30 flex items-center justify-center z-10'>
-                  <div className='text-red-800 text-xl rotate-[-45deg] w-full text-center bg-white/50'>
+                <div className='absolute inset-0 flex items-center justify-center z-10'>
+                  <div className='text-red-800 text-xl rotate-[-45deg] w-full text-center bg-white/35'>
                     Out of stock
                   </div>
                 </div>

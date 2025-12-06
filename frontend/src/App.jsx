@@ -8,14 +8,28 @@ import EditProductPage from './pages/EditProductPage';
 import { AuthPage } from './pages/AuthPage';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
-import ScrollToTop from './ScrollToTop';
+import GuestRoute from './GuestRoute';
 
 function App() {
   return (
     <Routes>
       {/* Auth routes (no navbar/footer) */}
-      <Route path='/login' element={<AuthPage />} />
-      <Route path='/register' element={<AuthPage />} />
+      <Route
+        path='/login'
+        element={
+          <GuestRoute>
+            <AuthPage />
+          </GuestRoute>
+        }
+      />
+      <Route
+        path='/register'
+        element={
+          <GuestRoute>
+            <AuthPage />
+          </GuestRoute>
+        }
+      />
 
       {/* Layout routes (with navbar + footer) */}
       <Route

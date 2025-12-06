@@ -1,33 +1,33 @@
-import { useEffect } from 'react'
-import { getProductById } from '../../api/productApi'
-import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { useProductStore } from '../../store/product'
-import { useAddToCart } from '../../hooks/useAddToCart'
+import { useEffect } from 'react';
+import { getProductById } from '../../api/productApi';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { useProductStore } from '../../store/product';
+import { useAddToCart } from '../../hooks/useAddToCart';
 
-const ProductCard = ({ product: initialProductData }) => {
-  const { setUpdateProduct } = useProductStore()
-  const addToCartMutation = useAddToCart()
+const ProductCard = ({ productData }) => {
+  const { setProductToEdit } = useProductStore();
+  const addToCartMutation = useAddToCart();
 
   const hasFullData =
-    initialProductData?.price &&
-    initialProductData?.stock !== undefined &&
-    initialProductData?.image
+    productData?.price &&
+    productData?.stock !== undefined &&
+    productData?.image;
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['getProductById', initialProductData?._id],
-    queryFn: () => getProductById(initialProductData._id),
-    initialData: hasFullData ? initialProductData : undefined,
+    queryKey: ['getProductById', productData?._id],
+    queryFn: () => getProductById(productData._id),
+    initialData: hasFullData ? productData : undefined,
     staleTime: 0,
-  })
+  });
 
-  console.log('product: ', data)
+  console.log('product: ', data);
 
   useEffect(() => {
     if (data) {
-      setUpdateProduct(data)
+      setProductToEdit(data);
     }
-  }, [data])
+  }, [data]);
 
   if (isLoading || !data)
     return (
@@ -51,12 +51,12 @@ const ProductCard = ({ product: initialProductData }) => {
           d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
         />
       </svg>
-    )
+    );
   if (isError)
-    return <div>Error: {error.response?.data?.message || error.message}</div>
+    return <div>Error: {error.response?.data?.message || error.message}</div>;
 
-  const currentStock = data.stock
-  const isOutOfStock = currentStock === 0
+  const currentStock = data.stock;
+  const isOutOfStock = currentStock === 0;
 
   return (
     <div>
@@ -68,12 +68,12 @@ const ProductCard = ({ product: initialProductData }) => {
       </Link>
       <div
         className={`w-70 group transform transition-all duration-100 ease-in-out overflow-hidden ${
-          isOutOfStock ? 'opacity-30 pointer-events-auto' : ''
+          isOutOfStock ? 'opacity-50 pointer-events-auto' : ''
         }`}
       >
         <Link to={`/product/${data?._id}`} state={{ data }}>
           <div
-            className={`flex relative items-center justify-center bg-gray-100/40 overflow-hidden w-full h-70 sm:h-70 group-hover:shadow-sm group-hover:scale-101 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out ${
+            className={`flex relative items-center justify-center overflow-hidden w-full h-70 sm:h-70 group-hover:shadow-sm group-hover:scale-101 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out ${
               !data?.image ? 'bg-neutral-100' : ''
             }`}
           >
@@ -84,8 +84,8 @@ const ProductCard = ({ product: initialProductData }) => {
             />
             {/* SOLD OUT overlay */}
             {isOutOfStock && (
-              <div className='absolute inset-0 bg-black/30 flex items-center justify-center'>
-                <div className='text-red-800 text-xl rotate-[-45deg] w-full text-center bg-white/50'>
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='text-red-800 text-xl rotate-[-45deg] w-full text-center bg-white/35'>
                   Out of stock
                 </div>
               </div>
@@ -161,7 +161,7 @@ const ProductCard = ({ product: initialProductData }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProductCard
+export default ProductCard;

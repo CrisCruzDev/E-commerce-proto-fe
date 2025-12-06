@@ -10,10 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.10.0",
-    "@tanstack/react-query": "^5.82.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/vite": "^4.1.7",
+    "@tanstack/react-query": "^5.82.0",
+    "axios": "^1.10.0",
+    "browser-image-compression": "^2.0.2",
     "mern": "file:..",
     "next-themes": "^0.4.4",
     "postcss": "^8.5.6",

@@ -1,4 +1,4 @@
-import { AiOutlineDelete } from 'react-icons/ai'
+import { AiOutlineDelete } from 'react-icons/ai';
 
 export const ReviewStep = ({
   formData,
@@ -8,25 +8,25 @@ export const ReviewStep = ({
   deleteProductMutation,
   isEditing,
 }) => {
-  const productId = formData._id
+  const productId = formData._id;
 
-  const handleEditClick = (stepNumber) => {
+  const handleEditClick = stepNumber => {
     if (setCurrentStep) {
-      setCurrentStep(stepNumber)
+      setCurrentStep(stepNumber);
     }
-  }
+  };
   const handleDeleteClick = () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      deleteProductMutation.mutate(productId)
+      deleteProductMutation.mutate(productId);
     }
-  }
+  };
   return (
     <div className='space-y-8'>
       <div className='flex flex-col items-center'>
         <div
-          className={`w-36 h-36 md:w-48 md:h-48 flex items-center justify-center overflow-hidden ${
-            formData.image ? 'bg-gray-100' : ''
-          }`}
+          className={
+            'w-36 h-36 md:w-48 md:h-48 flex items-center justify-center overflow-hidden'
+          }
         >
           {formData.image ? (
             <img
@@ -137,11 +137,14 @@ export const ReviewStep = ({
             {deleteProductMutation.isPending ? (
               'Deleting...'
             ) : (
-              <AiOutlineDelete className='w-5 h-5 mr-1' />
+              <div className='flex items-center justfy-center'>
+                <AiOutlineDelete className='w-5 h-5 mr-1'></AiOutlineDelete>
+                <p>Delete Product</p>
+              </div>
             )}
           </button>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
