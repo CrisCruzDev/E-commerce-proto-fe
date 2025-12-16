@@ -18,75 +18,63 @@ export const RegisterCard = ({ userData, setUserData }) => {
     setUserData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
   return (
-    <>
-      <div className='flex flex-col px-12 justify-center items-center w-60% h-full bg-[#FFFAF5]'>
-        <h1 className='flex gap-4 text-[35px] leading-tight'>
-          <LogoSvg />
-          Register your account
-        </h1>
-        <div className='flex justify-center items-center mt-10'>
-          <div className='bg-white w-90 h-115 flex flex-col items-center py-7 shadow-sm'>
-            <h1 className='text-[25px] font-medium'>create an account</h1>
-            <div className='w-full pt-10 px-12'>
-              <form onSubmit={handleSubmit} className='flex flex-col space-y-3'>
-                <input
-                  placeholder='name'
-                  type='text'
-                  value={userData.name}
-                  onChange={handleInput}
-                  name='name'
-                  id='name'
-                  className='block w-full border border-gray-300 py-2 px-3'
-                />
-                <input
-                  placeholder='Email address'
-                  type='email'
-                  value={userData.email}
-                  onChange={handleInput}
-                  name='email'
-                  id='email'
-                  className='block w-full border border-gray-300 py-2 px-3'
-                />
-                <input
-                  placeholder='password'
-                  type='password'
-                  value={userData.password}
-                  onChange={handleInput}
-                  name='password'
-                  id='password'
-                  className='block w-full border border-gray-300 py-2 px-3'
-                />
-                <div className='pt-7'>
-                  <button
-                    type='submit'
-                    className='w-full py-3 bg-black/92 text-white font-medium hover:bg-black transition-colors duration-150 cursor-pointer'
-                  >
-                    Sign up
-                  </button>
-                </div>
-              </form>
-            </div>
-            <div className='px-12 w-full'>
-              <div className='pt-3 flex items-center'>
-                <div className='flex-grow h-[0.5px] bg-black/20'></div>
-                <p className='px-2 text-black/30 font-thin text-sm'>
-                  Already have an account?
-                </p>
-                <div className='flex-grow h-[0.5px] bg-black/20'></div>
-              </div>
-
-              <div className='flex justify-center items-center'>
-                <Link
-                  to='/login'
-                  className='text-blue-500 text-sm font-medium hover:text-blue-800 -mt-1'
-                >
-                  Back to login
-                </Link>
-              </div>
-            </div>
+    <div className='w-105 h-115 flex flex-col items-center gap-[20px]'>
+      <h1 className='text-[25px] font-bebas'>Register</h1>
+      <div className='w-full pt-5 px-12'>
+        <form onSubmit={handleSubmit} className='flex flex-col space-y-[20px]'>
+          <input
+            placeholder='Name'
+            type='text'
+            value={userData.name}
+            onChange={handleInput}
+            name='name'
+            id='name'
+            className='block w-full border border-black py-2 px-3 rounded-xs'
+          />
+          <input
+            placeholder='Email address'
+            type='email'
+            value={userData.email}
+            onChange={handleInput}
+            name='email'
+            id='email'
+            className='block w-full border border-black py-2 px-3 rounded-xs'
+          />
+          <input
+            placeholder='Password'
+            type='password'
+            value={userData.password}
+            onChange={handleInput}
+            name='password'
+            id='password'
+            className='block w-full border border-black py-2 px-3 rounded-xs'
+          />
+          <div className='mt-[18px] px-8'>
+            <button
+              type='submit'
+              className='w-full py-3 bg-[#2E2E2E] text-white font-medium hover:bg-[#212121] transition-colors duration-150 cursor-pointer rounded-xs'
+            >
+              Sign up
+            </button>
           </div>
+        </form>
+      </div>
+      <div className='flex flex-col gap-[20px] px-12 w-full'>
+        <div className='flex items-center'>
+          <div className='flex-grow h-[0.5px] bg-black/20'></div>
+          <p className='px-2 text-gray-400 text-sm'>Already have an account?</p>
+          <div className='flex-grow h-[0.5px] bg-black/20'></div>
+        </div>
+
+        <div className='flex justify-center items-center'>
+          <Link
+            to='/login'
+            className='text-blue-500 text-xs hover:text-blue-800'
+          >
+            Back to login
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 };

@@ -1,16 +1,16 @@
 const Footer = () => {
   return (
-    <footer className='bg-black/92 py-15'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:flex md:justify-between md:items-center'>
-        <p className='text-gray-400 text-sm'>
-          &copy; {new Date().getFullYear()}. All rights reserved.
-        </p>
-        <div className='mt-4 md:mt-0'>
-          {/* You can add social media icons or other links here later */}
-          {/* For now, we'll keep it simple to match the theme */}
-        </div>
+    <footer className='flex bg-[#262626] py-[80px] px-[120px]'>
+      <div className='flex flex-col gap-[50px]'>
+        <h1 className='text-[64px]'>
+          Concept store designed for portfolio showcasing.
+        </h1>
+        <h3 className='text-[24px]'>created by: criscruzdev</h3>
+      </div>
+      <div className='flex items-end'>
+        <h3 className='text-[20px]'>Email me: criscrosscruz@gmail.com</h3>
       </div>
     </footer>
-  )
-}
-export default Footer
+  );
+};
+export default Footer;

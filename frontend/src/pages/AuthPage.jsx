@@ -16,7 +16,7 @@ const registerInitialState = {
   password: '',
 };
 
-export const AuthPage = () => {
+const AuthPage = () => {
   const location = useLocation();
   const isRegister = location.pathname === '/register';
 
@@ -29,18 +29,16 @@ export const AuthPage = () => {
   }, [isRegister]);
 
   return (
-    <div className='flex'>
-      <div className='flex-1 h-screen bg-[#FFFAF5]'>
+    <div className='flex items-center justify-center py-20'>
+      <div>
         {isRegister ? (
           <RegisterCard userData={userData} setUserData={setUserData} />
         ) : (
           <LoginCard userData={userData} setUserData={setUserData} />
         )}
       </div>
-      <div
-        className='w-1/2 h-screen bg-cover bg-center bg-no-repeat'
-        style={{ backgroundImage: `url(${bgLogin})` }}
-      ></div>
     </div>
   );
 };
+
+export default AuthPage;

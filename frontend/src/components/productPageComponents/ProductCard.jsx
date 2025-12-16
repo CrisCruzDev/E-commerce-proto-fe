@@ -6,7 +6,7 @@ import { useProductStore } from '../../store/product';
 import { useAddToCart } from '../../hooks/useAddToCart';
 
 const ProductCard = ({ productData }) => {
-  const { setProductToEdit } = useProductStore();
+  const setProductToEdit = useProductStore(s => s.setProductToEdit);
   const addToCartMutation = useAddToCart();
 
   const hasFullData =
@@ -73,7 +73,7 @@ const ProductCard = ({ productData }) => {
       >
         <Link to={`/product/${data?._id}`} state={{ data }}>
           <div
-            className={`flex relative items-center justify-center overflow-hidden w-full h-70 sm:h-70 group-hover:shadow-sm group-hover:scale-101 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out ${
+            className={`flex relative items-center justify-center overflow-hidden w-full h-70 sm:h-70 group-hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out ${
               !data?.image ? 'bg-neutral-100' : ''
             }`}
           >

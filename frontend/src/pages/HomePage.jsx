@@ -103,8 +103,8 @@ const HomePage = () => {
 
   if (isLoading) {
     return (
-      <div className='flex justify-center items-center h-screen'>
-        <p className='text-xl'>Loading products...</p>
+      <div className='absolute inset-0 flex items-center justify-center bg-white'>
+        <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
       </div>
     );
   }

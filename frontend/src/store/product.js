@@ -1,12 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export const initialProductState = {
+  products: [],
+  productToEdit: null,
+  stock: {},
+};
+
 export const useProductStore = create(
   persist(
-    set => ({
-      products: [],
-      productToEdit: null,
-      stock: {},
+    (set, get) => ({
+      ...initialProductState,
 
       setProductToEdit: product => {
         if (!product || typeof product !== 'object') {

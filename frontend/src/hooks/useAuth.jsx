@@ -7,6 +7,7 @@ import {
 import {
   getMe,
   loginUser,
+  logoutUser,
   registerUser,
   requestAdminKey,
   verifyAdminKey,
@@ -14,23 +15,26 @@ import {
 import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { useProductStore } from '../store/product';
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const setToken = useAuthStore(s => s.setToken);
 
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: data => {
-      console.log('LOGIN SUCCESS:', data);
-      if (!data?.accessToken) {
+    onSuccess: async res => {
+      const { setAuth } = useAuthStore.getState();
+      console.log('LOGIN SUCCESS:', res);
+
+      if (!res?.accessToken) {
         console.warn('❌ NO ACCESS TOKEN RECEIVED FROM BACKEND');
       }
+      setAuth({
+        accessToken: res?.accessToken,
+        user: res?.data,
+      });
 
-      setToken(data?.accessToken);
-      queryClient.invalidateQueries(['me']);
+      await useAuthStore.persist.rehydrate();
       navigate('/');
     },
     onError: err => {
@@ -50,21 +54,23 @@ export const useLogin = () => {
 };
 export const useRegister = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
-  const setToken = useAuthStore(s => s.setToken);
+  const { setAuth } = useAuthStore.getState();
 
   return useMutation({
     mutationFn: registerUser,
-    onSuccess: data => {
-      console.log('REGISTER SUCCESS:', data);
-      console.log('REGISTER RES:', data);
-      if (!data?.accessToken) {
-        toast.error('Registration succeeded but no access token received.');
+    onSuccess: async res => {
+      console.log('REGISTER SUCCESS:', res);
+      console.log('REGISTER RES:', res);
+      if (!res?.accessToken) {
+        toast.success('Please log in');
         return;
       }
-      setToken(data?.accessToken);
-      queryClient.invalidateQueries(['me']);
+      setAuth({
+        accessToken: res?.accessToken,
+        user: res?.data,
+      });
+      await useAuthStore.persist.rehydrate();
       navigate('/');
     },
     onError: err => {
@@ -79,28 +85,27 @@ export const useRegister = () => {
     ...queryOptions,
   });
 };
-export const useProfile = () => {
-  const setUser = useAuthStore(s => s.setUser);
-  const accessToken = useAuthStore(s => s.accessToken);
+// export const useProfile = () => {
+//   const setUser = useAuthStore(s => s.setUser);
+//   const accessToken = useAuthStore(s => s.accessToken);
 
-  return useQuery({
-    queryKey: ['me'],
-    queryFn: async () => {
-      const res = await getMe();
-      console.log('query result:', res);
-      setUser(res.data);
-      return res.data;
-    },
-    enabled: !!accessToken,
-    onError: err => {
-      console.error('ME ERROR:', err.response?.data || err.message);
-    },
-    onSettled: (data, error) => {
-      console.log('ME settled data:', data);
-      console.log('ME settled error:', error);
-    },
-  });
-};
+//   return useQuery({
+//     queryKey: ['me'],
+//     queryFn: async () => {
+//       const res = await getMe();
+//       console.log('query result:', res);
+//       return res.data;
+//     },
+//     enabled: !!accessToken,
+//     onError: err => {
+//       console.error('ME ERROR:', err.response?.data || err.message);
+//     },
+//     onSettled: (data, error) => {
+//       console.log('ME settled data:', data);
+//       console.log('ME settled error:', error);
+//     },
+//   });
+// };
 export const useRequestAdminKey = () => {
   return useMutation({
     mutationFn: requestAdminKey,
@@ -122,7 +127,6 @@ export const useVerifyAdminKey = () => {
     onSuccess: res => {
       console.log('ADMIN KEY VERIFIED:', res);
       setToken(res.accessToken);
-      queryClient.invalidateQueries(['me']);
       toast.success(res.message || 'Admin privileges granted');
     },
     onError: err => {
@@ -130,6 +134,41 @@ export const useVerifyAdminKey = () => {
         'ADMIN KEY VERIFICATION ERROR:',
         err.response?.data || err.message
       );
+    },
+  });
+};
+export const useLogout = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const accessToken = useAuthStore(s => s.accessToken);
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!accessToken) return;
+      try {
+        await logoutUser();
+      } catch (err) {
+        console.warn('Logout API failed:', err);
+        // still proceed with local logout
+      }
+    },
+    onSuccess: () => {
+      // CLEAR REACT QUERY CACHE
+      queryClient.removeQueries(['cart']);
+      queryClient.removeQueries(['products']);
+
+      const initialAuthState = useAuthStore.getInitialState();
+      const initialProductState = useProductStore.getInitialState();
+      // SYNCHRONOUSLY RESET ZUSTAND IN-MEMORY STATE
+      useAuthStore.setState(initialAuthState, true); // true for replace
+      useProductStore.setState(initialProductState, true);
+
+      // CLEAR PERSISTENT STORAGE
+      useAuthStore.persist.clearStorage();
+      useProductStore.persist.clearStorage();
+
+      navigate('/login', { replace: true });
     },
   });
 };

@@ -60,7 +60,7 @@ const ProductDetails = () => {
             >
               <p>Edit product &rarr;</p>
             </Link>
-            <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25 disabled: opacity-50'>
+            <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
               <img
                 src={product?.image}
                 alt='Product'

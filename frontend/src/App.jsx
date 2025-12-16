@@ -1,70 +1,80 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './Layout';
-import HomePage from './pages/HomePage';
-import CreatePage from './pages/CreatePage';
-import CartPage from './pages/CartPage';
-import ProductDetails from './pages/ProductDetails';
-import EditProductPage from './pages/EditProductPage';
-import { AuthPage } from './pages/AuthPage';
+
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
 import GuestRoute from './GuestRoute';
 
+import { lazy, Suspense, useEffect } from 'react';
+import { useAuthStore } from './store/auth';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const CreatePage = lazy(() => import('./pages/CreatePage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const EditProductPage = lazy(() => import('./pages/EditProductPage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const ProductDetails = lazy(() => import('./pages/ProductDetails'));
+
 function App() {
   return (
-    <Routes>
-      {/* Auth routes (no navbar/footer) */}
-      <Route
-        path='/login'
-        element={
-          <GuestRoute>
-            <AuthPage />
-          </GuestRoute>
-        }
-      />
-      <Route
-        path='/register'
-        element={
-          <GuestRoute>
-            <AuthPage />
-          </GuestRoute>
-        }
-      />
+    <Suspense fallback={null}>
+      <Routes>
+        {/* Shared layout (navbar/footer inside Layout) */}
+        <Route element={<Layout />}>
+          {/* Guest-only routes */}
+          <Route
+            path='/login'
+            element={
+              <GuestRoute>
+                <AuthPage />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path='/register'
+            element={
+              <GuestRoute>
+                <AuthPage />
+              </GuestRoute>
+            }
+          />
+          <Route path='/' element={<HomePage />} />
+          <Route path='/product/:id' element={<ProductDetails />} />
 
-      {/* Layout routes (with navbar + footer) */}
-      <Route
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path='/' element={<HomePage />} />
-        <Route path='/cart' element={<CartPage />} />
-        <Route path='/product/:id' element={<ProductDetails />} />
-        {/* ADMIN ONLY ROUTES */}
-        <Route
-          path='/create'
-          element={
-            <AdminRoute>
-              <CreatePage />
-            </AdminRoute>
-          }
-        />
+          {/* Protected: logged-in users only */}
+          <Route
+            path='/cart'
+            element={
+              <ProtectedRoute>
+                <CartPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path='/edit/:id'
-          element={
-            <AdminRoute>
-              <EditProductPage />
-            </AdminRoute>
-          }
-        />
-      </Route>
+          {/* Admin only */}
+          <Route
+            path='/create'
+            element={
+              <AdminRoute>
+                <CreatePage />
+              </AdminRoute>
+            }
+          />
 
-      {/* Catch-all redirect */}
-      <Route path='*' element={<Navigate to='/login' replace />} />
-    </Routes>
+          <Route
+            path='/edit/:id'
+            element={
+              <AdminRoute>
+                <EditProductPage />
+              </AdminRoute>
+            }
+          />
+        </Route>
+
+        {/* Catch-all → send back home */}
+        <Route path='*' element={<Navigate to='/' replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 

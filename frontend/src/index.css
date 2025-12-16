@@ -1,5 +1,5 @@
 /* @type tailwindcss */
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @import 'tailwindcss';
 
@@ -16,4 +16,23 @@
 
 .animate-fadeIn {
   animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-dropdownFadeScale {
+  animation: fadeScale 0.15s ease-out;
+}
+
+body {
+  font-family: 'Gothic A1', sans-serif;
 }
