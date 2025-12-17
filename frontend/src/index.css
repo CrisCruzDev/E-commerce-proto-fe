@@ -3,6 +3,24 @@
 
 @import 'tailwindcss';
 
+@theme {
+  --font-sans: 'Gothic A1', ui-sans-serif, system-ui, sans-serif;
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-gothic: 'Gothic A1', sans-serif;
+
+  --color-primary: #2e2e2e;
+  --color-secondary: #e54134;
+  --color-teal: #74d7c6;
+  --color-link: #498fff;
+  --color-yellow: #ffd540;
+
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  );
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -33,6 +51,6 @@
   animation: fadeScale 0.15s ease-out;
 }
 
-body {
+/* body {
   font-family: 'Gothic A1', sans-serif;
-}
+} */

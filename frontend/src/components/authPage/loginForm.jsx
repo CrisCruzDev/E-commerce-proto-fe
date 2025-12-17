@@ -42,27 +42,53 @@ export const LoginCard = ({ userData, setUserData }) => {
 
   return (
     <div className='w-105 h-115 flex flex-col items-center gap-[20px]'>
-      <h1 className='font-bebas text-[25px]'>Login</h1>
-      <div className='w-full pt-5 px-12'>
+      <h1 className='font-bebas text-[40px]'>Login</h1>
+      <div className='w-full pt-3 px-12'>
         <form onSubmit={handleSubmit} className='flex flex-col space-y-[20px]'>
-          <input
-            placeholder='Email address'
-            type='email'
-            value={userData.email}
-            onChange={handleInput}
-            name='email'
-            id='email'
-            className='block w-full border border-black py-2 px-3 rounded-xs'
-          />
-          <input
-            placeholder='Password'
-            type='password'
-            value={userData.password}
-            onChange={handleInput}
-            name='password'
-            id='password'
-            className='block w-full border border-black py-2 px-3 rounded-xs'
-          />
+          {/* EMAIL INPUT */}
+          <div className='relative'>
+            <input
+              type='email'
+              name='email'
+              id='email'
+              value={userData.email}
+              onChange={handleInput}
+              placeholder=' ' // 👈 Required for the animation to work
+              className='peer block w-full border border-black py-2 px-3 rounded-xs bg-transparent focus:outline-none focus:border-blue-500 font-sans'
+            />
+            <label
+              htmlFor='email'
+              className='absolute left-3 top-3 z-10 origin-[0] -translate-y-6 scale-75 transform bg-white px-1 text-sm duration-300 
+              peer-placeholder-shown:top-3 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 
+              peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:scale-75 
+              /* COLOR CUSTOMIZATION BELOW */
+              text-black peer-focus:text-blue-500 font-sans'
+            >
+              Email address
+            </label>
+          </div>
+          {/* PASSWORD INPUT */}
+          <div className='relative'>
+            <input
+              type='password'
+              name='password'
+              id='password'
+              value={userData.password}
+              onChange={handleInput}
+              placeholder=' '
+              className='peer block w-full border border-black py-2 px-3 rounded-xs bg-transparent focus:outline-none focus:border-blue-500 font-sans'
+            />
+            <label
+              htmlFor='password'
+              className='absolute left-3 top-3 z-10 origin-[0] -translate-y-6 scale-75 transform bg-white px-1 text-sm duration-300 
+              peer-placeholder-shown:top-3 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 
+              peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:scale-75 
+              /* COLOR CUSTOMIZATION BELOW */
+              text-black peer-focus:text-blue-500 font-sans'
+            >
+              Password
+            </label>
+          </div>
           <div className='w-full flex items-start justify-end -mt-2'>
             <Link className='text-blue-500 text-xs hover:text-blue-800'>
               Forgot password?
@@ -76,7 +102,7 @@ export const LoginCard = ({ userData, setUserData }) => {
                 loginMutation.isPending ? 'opacity-50' : ''
               }`}
             >
-              Sign in
+              <p className='font-bebas text-[20px]'>Sign in</p>
             </button>
           </div>
         </form>
