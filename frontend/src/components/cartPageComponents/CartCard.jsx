@@ -1,85 +1,81 @@
-import { useState } from 'react'
-import { updateCartItemQty, removeFromCart } from '../../api/cartApi'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import { useCartStore } from '../../store/cart'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { updateCartItemQty, removeFromCart } from '../../api/cartApi';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useCartStore } from '../../store/cart';
+import toast from 'react-hot-toast';
 
 const CartCard = ({ item }) => {
   if (!item || !item.product) {
-    return (
-      <div className='flex items-center justify-center p-6 border rounded-lg bg-gray-50'>
-        <p className='text-gray-500'>Loading item...</p>
-      </div>
-    )
+    return;
   }
 
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-  const [itemToDeleteId, setItemToDeleteId] = useState(null)
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
-  const openConfirmModal = () => setIsConfirmModalOpen(true)
-  const closeConfirmModal = () => setIsConfirmModalOpen(false)
+  const [itemToDeleteId, setItemToDeleteId] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
 
-  console.log('item:', item)
+  console.log('item:', item);
 
   const { data: productData } = useQuery({
     queryKey: ['getProductById', item?.product?._id],
     queryFn: () => getProductById(item.product._id),
     staleTime: 0,
     enabled: Boolean(item?.product?._id),
-  })
+  });
 
-  console.log('productData:', productData)
+  console.log('productData:', productData);
 
   if (!productData) {
-    return <div>Loading...</div>
+    return;
   }
 
-  console.log('productData:', productData)
+  console.log('productData:', productData);
 
   const updateQtyMutation = useMutation({
     mutationFn: ({ product_id, action }) => {
-      return updateCartItemQty(product_id, action)
+      return updateCartItemQty(product_id, action);
     },
     onMutate: async ({ product_id, action }) => {
-      await queryClient.cancelQueries(['cart'])
+      await queryClient.cancelQueries(['cart']);
 
-      const previousCart = queryClient.getQueryData(['cart'])
+      const previousCart = queryClient.getQueryData(['cart']);
 
       const currentProductData = queryClient.getQueryData([
         'getProductById',
         product_id,
-      ])
+      ]);
 
       if (
         action === 'increment' &&
         (!currentProductData || currentProductData.stock <= 0)
       ) {
-        return // don't optimistically update if no stock
+        return; // don't optimistically update if no stock
       }
 
-      queryClient.setQueryData(['cart'], (oldCartData) => {
-        if (!oldCartData || !oldCartData.items) return oldCartData
+      queryClient.setQueryData(['cart'], oldCartData => {
+        if (!oldCartData || !oldCartData.items) return oldCartData;
         const updatedItems = oldCartData.items
-          .map((cartItem) => {
+          .map(cartItem => {
             if (cartItem.product._id === product_id) {
-              let newQuantity = cartItem.quantity
+              let newQuantity = cartItem.quantity;
               if (action === 'increment') {
-                newQuantity += 1
+                newQuantity += 1;
               } else if (action === 'decrement') {
-                newQuantity = Math.max(1, newQuantity - 1)
+                newQuantity = Math.max(1, newQuantity - 1);
               }
-              return { ...cartItem, quantity: newQuantity }
+              return { ...cartItem, quantity: newQuantity };
             }
-            return cartItem
+            return cartItem;
           })
-          .filter((cartItem) => cartItem.quantity > 0) // Remove if quantity becomes 0
+          .filter(cartItem => cartItem.quantity > 0); // Remove if quantity becomes 0
 
         // If the item quantity becomes 0 and was removed, ensure the overall cart structure is correct
-        return { ...oldCartData, items: updatedItems }
-      })
+        return { ...oldCartData, items: updatedItems };
+      });
 
       // Update product stock optimistically
       if (currentProductData) {
@@ -89,106 +85,106 @@ const CartCard = ({ item }) => {
             action === 'increment'
               ? currentProductData.stock - 1
               : currentProductData.stock + 1,
-        })
+        });
       }
 
-      return { previousCart, currentProductData }
+      return { previousCart, currentProductData };
     },
 
     // Ensure data is fresh from server
     onSuccess: (data, variables) => {
-      console.log('variables.product_id: ', variables.product_id)
-      queryClient.setQueryData(['cart'], data.data)
+      console.log('variables.product_id: ', variables.product_id);
+      queryClient.setQueryData(['cart'], data.data);
       queryClient.invalidateQueries({
         queryKey: ['getProductById', variables.product_id],
-      })
+      });
     },
 
     // Roll back if mutation fails
     onError: (err, variables, context) => {
-      console.log('onError:', err)
+      console.log('onError:', err);
       if (context?.previousCart) {
-        queryClient.setQueryData(['cart'], context.previousCart)
+        queryClient.setQueryData(['cart'], context.previousCart);
       }
       if (context?.previousProduct) {
         queryClient.setQueryData(
           ['getProductById', variables.product_id],
-          context.previousProduct,
-        )
+          context.previousProduct
+        );
       }
       // optionally: show toast to user
-      alert(err.response?.data?.message || 'Something went wrong!')
+      alert(err.response?.data?.message || 'Something went wrong!');
     },
-  })
+  });
 
   const removeFromCartMutation = useMutation({
-    mutationFn: (product_id) => removeFromCart(product_id),
+    mutationFn: product_id => removeFromCart(product_id),
     onMutate: async ({ product_id }) => {
-      await queryClient.cancelQueries(['cart'])
-      const previousCart = queryClient.getQueryData(['cart'])
+      await queryClient.cancelQueries(['cart']);
+      const previousCart = queryClient.getQueryData(['cart']);
 
-      queryClient.setQueryData(['cart'], (oldCartData) => {
-        if (!oldCartData || !oldCartData.items) return oldCartData
+      queryClient.setQueryData(['cart'], oldCartData => {
+        if (!oldCartData || !oldCartData.items) return oldCartData;
 
         const updatedItems = oldCartData.items.filter(
-          (cartItem) => cartItem.product._id !== product_id,
-        )
+          cartItem => cartItem.product._id !== product_id
+        );
 
-        return { ...oldCartData, items: updatedItems }
-      })
+        return { ...oldCartData, items: updatedItems };
+      });
 
-      return { previousCart }
+      return { previousCart };
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['cart'], data.data)
-      toast.success('Item Removed')
-      queryClient.invalidateQueries(['cart'])
-      closeConfirmModal()
+    onSuccess: data => {
+      queryClient.setQueryData(['cart'], data.data);
+      toast.success('Item Removed');
+      queryClient.invalidateQueries(['cart']);
+      closeConfirmModal();
     },
 
     onError: (err, variables, context) => {
-      console.log('onError:', err)
+      console.log('onError:', err);
       if (context?.previousCart) {
-        queryClient.setQueryData(['cart'], context.previousCart)
-        toast.error('Remove item error')
+        queryClient.setQueryData(['cart'], context.previousCart);
+        toast.error('Remove item error');
       }
     },
-  })
+  });
 
-  const handleDecrement = (pid) => {
+  const handleDecrement = pid => {
     if (item.quantity === 1) {
-      setItemToDeleteId(item.product._id)
-      openConfirmModal()
+      setItemToDeleteId(item.product._id);
+      openConfirmModal();
     } else {
-      console.log('decrementID:', pid)
+      console.log('decrementID:', pid);
       updateQtyMutation.mutate({
         product_id: item.product._id,
         action: 'decrement',
-      })
+      });
     }
-  }
+  };
 
-  const handleIncrement = (pid) => {
-    console.log('incrementID:', pid)
+  const handleIncrement = pid => {
+    console.log('incrementID:', pid);
     if (productData?.stock <= 0) {
-      toast.error('Out of stock')
-      return
+      toast.error('Out of stock');
+      return;
     }
     updateQtyMutation.mutate({
       product_id: item.product._id,
       action: 'increment',
-    })
-  }
+    });
+  };
 
   const handleConfirmRemove = () => {
-    console.log('itemToDeleteId:', itemToDeleteId)
+    console.log('itemToDeleteId:', itemToDeleteId);
     if (itemToDeleteId) {
-      removeFromCartMutation.mutate(itemToDeleteId)
+      removeFromCartMutation.mutate(itemToDeleteId);
     }
-  }
+  };
 
   return (
-    <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4 items-center py-5 px-4 sm:px-8 border border-gray-200 mt-3 '>
+    <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4 items-center py-5 px-4 sm:px-8 border border-primary/50 mt-3 rounded-xs'>
       <div
         className='flex items-center space-x-4 col-span-2 w-full cursor-pointer'
         onClick={() => navigate(`/product/${productData?._id}`)}
@@ -203,7 +199,7 @@ const CartCard = ({ item }) => {
 
         <div className='flex-grow'>
           <p className='text-lg font-medium'>{productData?.name}</p>
-          <p className='text-xs font-light text-gray-500/50 mt-1'>
+          <p className='text-xs font-light text-primary mt-1'>
             {productData?._id}
           </p>
         </div>
@@ -217,7 +213,7 @@ const CartCard = ({ item }) => {
         <p className='hidden sm:block'>${productData?.price}</p>
         <div className='flex flex-col items-center sm:hidden'>
           <p className='text-sm text-gray-500'>Quantity</p>
-          <div className='w-24 flex items-center justify-between border border-gray-300'>
+          <div className='w-24 flex items-center justify-between border border-primary/50'>
             <button
               className='w-full hover:bg-gray-100 cursor-pointer p-1'
               onClick={() => handleDecrement(item.product._id)}
@@ -225,7 +221,7 @@ const CartCard = ({ item }) => {
             >
               -
             </button>
-            <p className='px-2 border-x border-gray-300'>{item?.quantity}</p>
+            <p className='px-2 border-x border-primary/50'>{item?.quantity}</p>
             <button
               className='w-full hover:!bg-gray-100 cursor-pointer p-1'
               onClick={() => handleIncrement(item.product._id)}
@@ -235,7 +231,7 @@ const CartCard = ({ item }) => {
             </button>
           </div>
         </div>
-        <div className='hidden sm:flex items-center justify-center w-24 border border-gray-300'>
+        <div className='hidden sm:flex items-center justify-center w-24 border border-primary/50'>
           <button
             className='w-full hover:bg-gray-100 cursor-pointer p-1'
             onClick={() => handleDecrement(item.product._id)}
@@ -243,7 +239,7 @@ const CartCard = ({ item }) => {
           >
             -
           </button>
-          <p className='px-2 border-x border-gray-300'>{item?.quantity}</p>
+          <p className='px-2 border-x border-primary/50'>{item?.quantity}</p>
           <button
             className='w-full hover:!bg-gray-100 cursor-pointer p-1'
             onClick={() => handleIncrement(item.product._id)}
@@ -312,7 +308,7 @@ const CartCard = ({ item }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CartCard
+export default CartCard;

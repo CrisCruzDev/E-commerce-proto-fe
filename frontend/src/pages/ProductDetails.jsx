@@ -55,33 +55,35 @@ const ProductDetails = () => {
           {/* Left Side: Image */}
           <div className='flex-1'>
             <Link
-              className='text-[12px] transition-colors cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
+              className='text-[12px] cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
               to={`/edit/${productId}`}
             >
               <p>Edit product &rarr;</p>
             </Link>
-            <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
-              <img
-                src={product?.image}
-                alt='Product'
-                className='object-contain h-full'
-              />
-              {/* SOLD OUT overlay */}
-              {isOutOfStock && (
-                <div className='absolute inset-0 flex items-center justify-center z-10'>
-                  <div className='text-red-800 text-xl rotate-[-45deg] w-full text-center bg-white/35'>
-                    Out of stock
+            <button
+              className='cursor-pointer'
+              onClick={() => setIsExpanded(true)}
+              disabled={isOutOfStock}
+            >
+              <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
+                <img
+                  src={product?.image}
+                  alt='Product'
+                  className='object-contain h-full'
+                />
+                {/* SOLD OUT overlay */}
+                {isOutOfStock && (
+                  <div className='absolute inset-0 flex items-center justify-center z-10 bg-white/50 backdrop-blur-[1px]'>
+                    <div className='text-red-600 font-bebas text-xl w-[75%] text-center bg-yellow/25 shadow-xs'>
+                      Out of stock
+                    </div>
                   </div>
-                </div>
-              )}
-              <button
-                className='text-gray-400 text-sm absolute bottom-4 right-4 cursor-pointer'
-                onClick={() => setIsExpanded(true)}
-                disabled={isOutOfStock}
-              >
-                Click to expand
-              </button>
-            </div>
+                )}
+                <p className='text-gray-400 text-sm absolute bottom-4 right-4'>
+                  Click to expand
+                </p>
+              </div>
+            </button>
           </div>
 
           {/* Right Side: Details */}
@@ -120,7 +122,7 @@ const ProductDetails = () => {
             >
               {currentStock > 0
                 ? currentStock < 6
-                  ? `Only ${''} ${currentStock} ${''} left`
+                  ? `Only ${''} ${currentStock} ${''} left !`
                   : `${currentStock} ${''} left`
                 : 'Out of stock'}
             </div>

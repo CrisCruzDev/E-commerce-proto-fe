@@ -41,8 +41,8 @@ const CartPage = () => {
 
   if (isLoading) {
     return (
-      <div className='flex items-center justify-center h-screen'>
-        <p className='text-lg text-gray-600'>Loading cart...</p>
+      <div className='absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm'>
+        <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
       </div>
     );
   }
@@ -72,13 +72,11 @@ const CartPage = () => {
   if (cartItems.length === 0) {
     // Check the length of the extracted cartItems array
     return (
-      <div className='flex flex-col items-center justify-center h-screen'>
-        <p className='text-5xl font-semibold text-gray-700 mb-4'>
-          Your cart is empty
-        </p>
+      <div className='py-20 flex flex-col items-center justify-start h-screen'>
+        <p className='text-[75px] font-bebas text-yellow'>Your cart is empty</p>
         <Link
           to='/'
-          className='px-8 py-2 border border-black/50 hover:bg-gray-100 text-black  duration-150'
+          className='px-8 py-3 border bg-primary hover:bg-black text-white font-bebas text-[20px] duration-150 rounded-xs'
         >
           Continue shopping
         </Link>
@@ -87,14 +85,14 @@ const CartPage = () => {
   }
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-4 py-8 font-bebas text-black'>
       <div className='flex flex-col lg:flex-row gap-8'>
         <div className='flex-1'>
-          <h1 className='text-3xl font-bold mb-6'>Shopping Cart</h1>
-          <div className='hidden sm:grid grid-cols-4 gap-4 pb-3 mt-1 px-5 border-b border-gray-300'>
-            <p className='col-span-2 text-gray-500'>Item</p>
+          <h1 className='text-5xl py-3'>Shopping Cart</h1>
+          <div className='hidden sm:grid grid-cols-4 gap-4 pb-3 px-5 text-black mt-5'>
+            <p className='col-span-2'>Item</p>
 
-            <div className='flex justify-between col-span-2 text-gray-500'>
+            <div className='flex justify-between col-span-2'>
               <p>Price</p> <p>Quantity</p>
               <p>Total</p>
             </div>

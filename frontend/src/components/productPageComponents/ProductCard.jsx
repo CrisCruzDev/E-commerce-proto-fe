@@ -61,102 +61,71 @@ const ProductCard = ({ productData }) => {
   return (
     <div>
       <Link
-        className='text-[10px] transition-colors cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
+        className='text-[10px] cursor-pointer text-gray-400 hover:text-black transition-colors duration-200'
         to={`/edit/${data?._id}`}
       >
-        <p>Edit &rarr;</p>
+        <p>Quick edit &rarr;</p>
       </Link>
-      <div
-        className={`w-70 group transform transition-all duration-100 ease-in-out overflow-hidden ${
-          isOutOfStock ? 'opacity-50 pointer-events-auto' : ''
-        }`}
-      >
+      <div className='w-full group transform transition-all duration-100 ease-in-out overflow-hidden'>
         <Link to={`/product/${data?._id}`} state={{ data }}>
           <div
-            className={`flex relative items-center justify-center overflow-hidden w-full h-70 sm:h-70 group-hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out ${
+            className={`flex relative items-center justify-center overflow-hidden w-full aspect-square transition-all duration-300 ${
               !data?.image ? 'bg-neutral-100' : ''
             }`}
           >
             <img
               src={data?.image}
               alt={data?.name}
-              className='object-contain w-full h-full '
+              className='object-contain w-[80%] h-[80%] group-hover:scale-105 transition-transform duration-200'
             />
             {/* SOLD OUT overlay */}
             {isOutOfStock && (
-              <div className='absolute inset-0 flex items-center justify-center'>
-                <div className='text-red-800 text-xl rotate-[-45deg] w-full text-center bg-white/35'>
+              <div className='absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]'>
+                <div className='text-red-600 font-bebas text-xl w-[75%] text-center bg-yellow/25 shadow-xs'>
                   Out of stock
                 </div>
               </div>
             )}
           </div>
 
-          <div className='flex justify-center items-center pb-3'></div>
-
           <div>
-            <p className='text-xs'>{data?.brand ?? 'N/A'}</p>
-          </div>
-          <div className='flex py-1'>
-            <p className='text-lg font-semibold group-hover:text-orange-500 transition-colors duration-300 ease-in-out'>
+            <p className='text-xs font-thin uppercase tracking-wide'>
+              {data?.brand ?? 'N/A'}
+            </p>
+            <p className='text-lg font-semibold tracking-tight group-hover:text-orange-500 transition-colors duration-300 ease-in-out'>
               {data.name}
             </p>
           </div>
         </Link>
 
-        <div className='flex flex-col justify-between items-start gap-2'>
-          <p className='text-md font-semibold text-black'>${data?.price}</p>
+        <div className='flex flex-row justify-between items-center'>
+          <div className='pt-1.5'>
+            <p className='text-lg tracking-tight text-black'>
+              From ${data?.price}
+            </p>
+          </div>
           <button
-            className='bg-black/92 text-white h-6 hover:bg-black transition-colors duration-200
-                     disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
+            className=' h-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
             onClick={() => addToCartMutation.mutate({ id: data?._id, qty: 1 })}
-            disabled={isOutOfStock || addToCartMutation.isLoading}
+            disabled={isOutOfStock || addToCartMutation.isPending}
           >
-            {addToCartMutation.isPending ? (
-              // Spinner
-              <div className='flex items-center px-9 space-x-1'>
-                <svg
-                  className='animate-spin h-5 w-5 text-white mx-auto'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  />
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
-                  />
-                </svg>
-              </div>
-            ) : (
-              // Default cart icon + text
-              <div className='flex items-center px-2 space-x-1'>
-                <svg
-                  className='w-3 h-3 text-white'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6'
-                  />
-                </svg>
-                <p className='text-white text-xs'>Add to cart</p>
-              </div>
-            )}
+            <div className='flex items-start px-2 space-x-1 text-black/50 hover:text-black'>
+              <svg
+                className='w-5 h-5'
+                aria-hidden='true'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='0.5'
+                  d='M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6'
+                />
+              </svg>
+            </div>
           </button>
         </div>
       </div>

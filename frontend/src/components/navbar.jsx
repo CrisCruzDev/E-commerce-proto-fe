@@ -244,7 +244,7 @@ const Navbar = () => {
               <Link
                 to='/cart'
                 onClick={() => setMobileOpen(false)}
-                className='flex items-center space-x-3 text-white text-2xl'
+                className='flex items-start space-x-3 text-white text-2xl'
               >
                 <CartIcon className='w-6 h-6 text-white' />
                 <span>Cart</span>
@@ -258,7 +258,7 @@ const Navbar = () => {
                   }}
                   className='text-red-500 text-2xl font-semibold'
                 >
-                  Logout ({user.role || 'User'})
+                  Logout
                 </button>
               ) : (
                 <Link

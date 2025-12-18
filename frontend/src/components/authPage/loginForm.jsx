@@ -98,7 +98,7 @@ export const LoginCard = ({ userData, setUserData }) => {
             <button
               type='submit'
               disabled={loginMutation.isPending}
-              className={`w-full py-3 bg-[#2E2E2E] text-white font-medium hover:bg-[#212121] transition-colors duration-150 cursor-pointer rounded-xs ${
+              className={`w-full py-3 bg-primary text-white font-medium hover:bg-[#212121] transition-colors duration-150 cursor-pointer rounded-xs ${
                 loginMutation.isPending ? 'opacity-50' : ''
               }`}
             >
