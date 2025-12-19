@@ -22,13 +22,6 @@ const FeaturedProducts = () => {
 
   const loadMore = () => setVisibleCount(prev => prev + 4);
 
-  if (isLoading)
-    return (
-      <div className='absolute inset-0 flex items-center justify-center bg-white'>
-        <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
-      </div>
-    );
-
   return (
     <section className='w-full py-20 px-4 md:px-12 lg:px-[100px] bg-white'>
       {/* Editorial Header */}
@@ -41,6 +34,12 @@ const FeaturedProducts = () => {
         </p>
         <div className='h-1 w-full bg-yellow mt-10 rounded-xs' />
       </div>
+
+      {isLoading && (
+        <div className='flex items-center justify-center bg-white'>
+          <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
+        </div>
+      )}
 
       {/* 4 COLUMN GRID */}
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 lg:gap-8'>
