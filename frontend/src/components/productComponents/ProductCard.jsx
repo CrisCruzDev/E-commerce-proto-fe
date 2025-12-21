@@ -1,81 +1,50 @@
 import { useEffect } from 'react';
-import { getProductById } from '../../api/productApi';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useProductStore } from '../../store/product';
 import { useAddToCart } from '../../hooks/useAddToCart';
+import { useAuthStore } from '../../store/auth';
+import { formatPrice } from '../../utils/formatCurrency';
 
-const ProductCard = ({ productData }) => {
+const ProductCard = ({ productData, isLoading, isError, error }) => {
   const setProductToEdit = useProductStore(s => s.setProductToEdit);
+  const user = useAuthStore(s => s.user);
   const addToCartMutation = useAddToCart();
 
-  const hasFullData =
-    productData?.price &&
-    productData?.stock !== undefined &&
-    productData?.image;
+  if (isLoading || !productData)
+    return <svg className='animate-spin h-10 w-10 text-white mx-auto' />;
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['getProductById', productData?._id],
-    queryFn: () => getProductById(productData._id),
-    initialData: hasFullData ? productData : undefined,
-    staleTime: 0,
-  });
-
-  console.log('product: ', data);
-
-  useEffect(() => {
-    if (data) {
-      setProductToEdit(data);
-    }
-  }, [data]);
-
-  if (isLoading || !data)
-    return (
-      <svg
-        className='animate-spin h-10 w-10 text-white mx-auto'
-        xmlns='http://www.w3.org/2000/svg'
-        fill='none'
-        viewBox='0 0 24 24'
-      >
-        <circle
-          className='opacity-25'
-          cx='12'
-          cy='12'
-          r='10'
-          stroke='currentColor'
-          strokeWidth='4'
-        />
-        <path
-          className='opacity-75'
-          fill='currentColor'
-          d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
-        />
-      </svg>
-    );
   if (isError)
     return <div>Error: {error.response?.data?.message || error.message}</div>;
 
-  const currentStock = data.stock;
+  const currentStock = productData.stock;
   const isOutOfStock = currentStock === 0;
+
+  const handleEditClick = () => {
+    setProductToEdit(productData);
+  };
 
   return (
     <div>
-      <Link
-        className='text-[10px] cursor-pointer text-gray-400 hover:text-black transition-colors duration-200'
-        to={`/edit/${data?._id}`}
-      >
-        <p>Quick edit &rarr;</p>
-      </Link>
+      {user?.role === 'admin' && (
+        <Link
+          className='text-[10px] cursor-pointer text-gray-400 hover:text-black transition-colors duration-200'
+          to={`/edit/${productData?._id}`}
+          onClick={handleEditClick}
+        >
+          <p>Edit &rarr;</p>
+        </Link>
+      )}
       <div className='w-full group transform transition-all duration-100 ease-in-out overflow-hidden'>
-        <Link to={`/product/${data?._id}`} state={{ data }}>
+        <Link to={`/product/${productData?._id}`} state={{ productData }}>
           <div
             className={`flex relative items-center justify-center overflow-hidden w-full aspect-square transition-all duration-300 ${
-              !data?.image ? 'bg-neutral-100' : ''
+              !productData?.image ? 'bg-neutral-100' : ''
             }`}
           >
             <img
-              src={data?.image}
-              alt={data?.name}
+              src={productData?.image}
+              alt={productData?.name}
+              loading='lazy'
               className='object-contain w-[80%] h-[80%] group-hover:scale-105 transition-transform duration-200'
             />
             {/* SOLD OUT overlay */}
@@ -90,23 +59,25 @@ const ProductCard = ({ productData }) => {
 
           <div>
             <p className='text-xs font-thin uppercase tracking-wide'>
-              {data?.brand ?? 'N/A'}
+              {productData?.brand ?? 'N/A'}
             </p>
             <p className='text-lg font-semibold tracking-tight group-hover:text-orange-500 transition-colors duration-300 ease-in-out'>
-              {data.name}
+              {productData.name}
             </p>
           </div>
         </Link>
 
         <div className='flex flex-row justify-between items-center'>
           <div className='pt-1.5'>
-            <p className='text-lg tracking-tight text-black'>
-              From ${data?.price}
+            <p className='text-md tracking-tight text-black'>
+              From {formatPrice(productData?.price)}
             </p>
           </div>
           <button
             className=' h-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
-            onClick={() => addToCartMutation.mutate({ id: data?._id, qty: 1 })}
+            onClick={() =>
+              addToCartMutation.mutate({ id: productData?._id, qty: 1 })
+            }
             disabled={isOutOfStock || addToCartMutation.isPending}
           >
             <div className='flex items-start px-2 space-x-1 text-black/50 hover:text-black'>

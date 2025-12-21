@@ -4,8 +4,6 @@ import { getCart } from '../api/cartApi';
 import CartCard from '../components/cartPageComponents/CartCard';
 import { SummaryCard } from '../components/cartPageComponents/SummaryCard';
 import { getProductById } from '../api/productApi';
-import toast from 'react-hot-toast';
-
 const CartPage = () => {
   const queryClient = useQueryClient();
 
@@ -38,14 +36,6 @@ const CartPage = () => {
   });
 
   console.log('cart: ', cartData);
-
-  if (isLoading) {
-    return (
-      <div className='absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm'>
-        <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
-      </div>
-    );
-  }
 
   if (isError) {
     return (

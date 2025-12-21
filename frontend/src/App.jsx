@@ -56,7 +56,7 @@ function App() {
             path='/create'
             element={
               <AdminRoute>
-                <CreatePage />
+                <CreatePage key='create' isEditMode={false} />
               </AdminRoute>
             }
           />
@@ -65,7 +65,7 @@ function App() {
             path='/edit/:id'
             element={
               <AdminRoute>
-                <EditProductPage />
+                <EditProductPage key='edit' isEditMode={true} />
               </AdminRoute>
             }
           />

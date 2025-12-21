@@ -8,23 +8,23 @@ import { useEffect } from 'react';
 
 const EditProductPage = () => {
   const { id } = useParams();
-  const { setProductToEdit, clearProductToEdit } = useProductStore();
+  const clearProductToEdit = useProductStore(s => s.clearProductToEdit);
+  const setProductToEdit = useProductStore(s => s.setProductToEdit);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['getProductById', id],
     queryFn: () => getProductById(id),
     enabled: !!id,
+    // 💡 ensures the store is updated as soon as data arrives
+    select: data => {
+      setProductToEdit(data);
+      return data;
+    },
   });
 
   useEffect(() => {
-    if (product) {
-      setProductToEdit(product);
-    }
-  }, [product]);
-
-  useEffect(() => {
     return () => clearProductToEdit();
-  }, []);
+  }, [clearProductToEdit]);
 
   if (isLoading) return <p>Loading...</p>;
 

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '../../api/productApi';
-import ProductCard from '../productPageComponents/ProductCard';
+import ProductCard from '../productComponents/ProductCard';
+import ProductSkeleton from '../productComponents/ProductSkeleton';
 
 const FeaturedProducts = () => {
   const [visibleCount, setVisibleCount] = useState(8);
@@ -15,10 +16,9 @@ const FeaturedProducts = () => {
   } = useQuery({
     queryKey: ['products'],
     queryFn: () => getProducts(),
-    onSuccess: data => {
-      console.log(data);
-    },
   });
+
+  console.log('fetch all products', products);
 
   const loadMore = () => setVisibleCount(prev => prev + 4);
 
@@ -43,13 +43,23 @@ const FeaturedProducts = () => {
 
       {/* 4 COLUMN GRID */}
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 lg:gap-8'>
-        {products?.slice(0, visibleCount).map(product => (
-          <ProductCard key={product._id} productData={product} />
-        ))}
+        {isLoading
+          ? [...Array(8)].map((_, i) => <ProductSkeleton key={i} />)
+          : products
+              ?.slice(0, visibleCount)
+              .map(product => (
+                <ProductCard
+                  key={product._id}
+                  productData={product}
+                  isLoading={isLoading}
+                  isError={isError}
+                  error={error}
+                />
+              ))}
       </div>
 
       {/* Load More Button */}
-      {products && visibleCount < products.length && (
+      {!isLoading && visibleCount < products?.length && (
         <div className='mt-24 flex justify-center'>
           <button
             onClick={loadMore}

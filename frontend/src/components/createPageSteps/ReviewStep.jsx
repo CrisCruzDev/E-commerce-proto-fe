@@ -1,4 +1,5 @@
 import { AiOutlineDelete } from 'react-icons/ai';
+import { formatPrice } from '../../utils/formatCurrency';
 
 export const ReviewStep = ({
   formData,
@@ -8,7 +9,11 @@ export const ReviewStep = ({
   deleteProductMutation,
   isEditing,
 }) => {
-  const productId = formData._id;
+  if (!formData || (!formData._id && !formData.name)) {
+    return null;
+  }
+
+  const productId = formData?._id;
 
   const handleEditClick = stepNumber => {
     if (setCurrentStep) {
@@ -96,7 +101,7 @@ export const ReviewStep = ({
           <div className='flex justify-between border-gray-200 pb-2'>
             <p className='text-gray-500'>Price</p>
             <p className='font-medium'>
-              {formData.price ? `$${formData.price}` : 'N/A'}
+              {formData.price ? `${formatPrice(formData.price)}` : 'N/A'}
             </p>
           </div>
         </div>
@@ -106,7 +111,7 @@ export const ReviewStep = ({
         <button
           type='button'
           onClick={onPrevious}
-          className='w-full sm:w-auto px-6 py-2 border border-black text-black font-medium hover:bg-gray-100 disabled:bg-gray-100 disabled:text-gray-400 cursor-pointer'
+          className='w-full sm:w-auto px-6 py-2 border border-primary text-primary font-medium hover:bg-gray-100 cursor-pointer rounded-xs'
           disabled={isSubmitting}
         >
           Back
@@ -114,7 +119,7 @@ export const ReviewStep = ({
 
         <button
           type='submit'
-          className='w-full sm:w-auto px-6 py-2 bg-black/90 text-white font-medium hover:bg-black disabled:bg-gray-400 cursor-pointer'
+          className='w-full sm:w-auto px-6 py-2 bg-primary text-white font-medium hover:bg-black disabled:bg-gray-400 cursor-pointer rounded-xs'
           disabled={isSubmitting}
         >
           {isSubmitting

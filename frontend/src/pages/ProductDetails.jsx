@@ -1,24 +1,31 @@
 import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCartStore } from '../store/cart';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { getProductById } from '../api/productApi';
+import { useAuthStore } from '../store/auth';
 
 const ProductDetails = () => {
-  const { id: routeId } = useParams(); // if you're using `/product/:id`
-  const productId = routeId;
-  console.log('productId: ', productId);
+  const { id: productId } = useParams();
+  const queryClient = useQueryClient();
 
   const addToCartMutation = useAddToCart();
   const { resetQuantity } = useCartStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [qty, setQty] = useState(1);
 
+  const user = useAuthStore(s => s.user);
+
   const { data: productFromQuery } = useQuery({
     queryKey: ['getProductById', productId],
     queryFn: () => getProductById(productId),
+    initialData: () => {
+      return queryClient
+        .getQueryData(['products'])
+        ?.find(p => p._id === productId);
+    },
   });
 
   const product = productFromQuery;
@@ -54,12 +61,15 @@ const ProductDetails = () => {
         <div className='flex flex-col md:flex-row gap-8 md:gap-16'>
           {/* Left Side: Image */}
           <div className='flex-1'>
-            <Link
-              className='text-[12px] cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
-              to={`/edit/${productId}`}
-            >
-              <p>Edit product &rarr;</p>
-            </Link>
+            {user?.role === 'admin' && (
+              <Link
+                className='text-[12px] cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
+                to={`/edit/${productId}`}
+              >
+                <p>Edit product &rarr;</p>
+              </Link>
+            )}
+
             <button
               className='cursor-pointer'
               onClick={() => setIsExpanded(true)}

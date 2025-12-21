@@ -4,67 +4,58 @@ import { persist } from 'zustand/middleware';
 export const initialProductState = {
   products: [],
   productToEdit: null,
-  stock: {},
+};
+
+export const initialFormState = {
+  currentStep: 1,
+  //for forms in create/edit product
+  draftFormData: {
+    name: '',
+    price: '',
+    image: '',
+    description: '',
+    category: '',
+    brand: '',
+    stock: '',
+  },
 };
 
 export const useProductStore = create(
   persist(
     (set, get) => ({
       ...initialProductState,
+      ...initialFormState,
 
       setProductToEdit: product => {
-        if (!product || typeof product !== 'object') {
-          console.warn('Invalid product passed to setProductToEdit:', product);
-          return;
-        }
-
-        const sanitized = sanitizeProduct(product);
-        set({ productToEdit: sanitized });
+        if (!product) return;
+        set({
+          productToEdit: product,
+          draftFormData: product, // Fill the draft immediately
+          currentStep: 1,
+        });
       },
-
       clearProductToEdit: () => set({ productToEdit: null }),
 
-      setStock: (id, newStock) => {
+      // 💡 Methods to update draft and steps
+      updateDraftData: newData =>
         set(state => ({
-          stock: {
-            ...state.stock,
-            [id]: newStock,
-          },
-        }));
-      },
+          draftFormData: { ...state.draftFormData, ...newData },
+        })),
+      setCurrentStep: step => set({ currentStep: step }),
+      resetCreateForm: () =>
+        set({
+          draftFormData: initialFormState.draftFormData,
+          currentStep: 1,
+          productToEdit: null,
+        }),
     }),
     {
       name: 'product-store',
       partialize: state => ({
         products: state.products,
-        stock: state.stock,
+        draftFormData: state.draftFormData,
+        currentStep: state.currentStep,
       }),
     }
   )
 );
-
-// 👇 Sanitize function to exclude large fields
-function sanitizeProduct(product) {
-  const MAX_IMAGE_LENGTH = 1000;
-  const MAX_DESCRIPTION_LENGTH = 1000;
-
-  const {
-    image,
-    description,
-    // optionally exclude or shorten arrays
-    ...rest
-  } = product;
-
-  return {
-    ...rest,
-    image:
-      typeof image === 'string' && image.length <= MAX_IMAGE_LENGTH
-        ? image
-        : 'Image file too large*',
-    description:
-      typeof description === 'string'
-        ? description.slice(0, MAX_DESCRIPTION_LENGTH)
-        : '',
-    // optionally include reviews if small: reviews?.slice?.(0, 3),
-  };
-}

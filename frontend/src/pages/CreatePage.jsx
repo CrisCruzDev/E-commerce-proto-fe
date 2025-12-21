@@ -10,35 +10,35 @@ import toast from 'react-hot-toast';
 import { useProductStore } from '../store/product';
 
 const CreatePage = ({ isEditMode = false }) => {
+  const location = useLocation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { productToEdit, clearProductToEdit } = useProductStore();
 
-  const [productFormData, setProductFormData] = useState({
-    name: '',
-    price: '',
-    image: '',
-    imagePublicId: '',
-    description: '',
-    category: '',
-    brand: '',
-    stock: '',
-  });
+  const productToEdit = useProductStore(s => s.productToEdit);
+  const draftFormData = useProductStore(s => s.draftFormData);
+  const currentStep = useProductStore(s => s.currentStep);
 
-  useEffect(() => {
-    if (!isEditMode) clearProductToEdit();
-  }, [isEditMode]);
+  const updateDraftData = useProductStore(s => s.updateDraftData);
+  const setCurrentStep = useProductStore(s => s.setCurrentStep);
+  const resetCreateForm = useProductStore(s => s.resetCreateForm);
+
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     if (isEditMode && productToEdit) {
-      setProductFormData(productToEdit);
+      updateDraftData(productToEdit);
+    } else if (!isEditMode && productToEdit) {
+      resetCreateForm();
     }
-  }, [isEditMode, productToEdit]);
+  }, [
+    isEditMode,
+    productToEdit,
+    location.pathname,
+    updateDraftData,
+    resetCreateForm,
+  ]);
 
   console.log('Loaded product from store:', productToEdit);
-
-  const [currentStep, setCurrentStep] = useState(1);
-  const [validationErrors, setValidationErrors] = useState({});
 
   const sidebarSteps = [
     {
@@ -50,20 +50,6 @@ const CreatePage = ({ isEditMode = false }) => {
     { id: 3, name: 'Review', requiredFields: [] },
   ];
 
-  const resetForm = () => {
-    setProductFormData({
-      name: '',
-      price: '',
-      image: '',
-      description: '',
-      category: '',
-      brand: '',
-      stock: '',
-    });
-    setValidationErrors({});
-    setCurrentStep(1);
-  };
-
   const createProductMutation = useMutation({
     mutationFn: async newProduct => await createProduct(newProduct),
     onMutate: async () => {
@@ -74,7 +60,7 @@ const CreatePage = ({ isEditMode = false }) => {
       queryClient.invalidateQueries(['products']);
       console.log(data.message);
       toast.success('Product created!');
-      resetForm();
+      resetCreateForm();
       navigate('/');
     },
     onError: err => {
@@ -88,13 +74,14 @@ const CreatePage = ({ isEditMode = false }) => {
       return await updateProduct({ id, product });
     },
     onSuccess: updatedProduct => {
+      resetCreateForm();
       queryClient.setQueryData(
         ['getProductById', updatedProduct._id],
         updatedProduct
       );
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Product updated successfully!');
-      navigate('/');
+      navigate('/', { replace: true });
     },
     onError: err => {
       console.error('[Mutation Error]', err);
@@ -136,7 +123,7 @@ const CreatePage = ({ isEditMode = false }) => {
 
     if (currentStepConfig) {
       currentStepConfig.requiredFields.forEach(field => {
-        const value = productFormData[field];
+        const value = draftFormData[field];
 
         if (field === 'price') {
           if (!value || parseFloat(value) === 0) {
@@ -155,19 +142,19 @@ const CreatePage = ({ isEditMode = false }) => {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prevStep => prevStep + 1);
+      setCurrentStep(currentStep + 1);
     } else {
       toast.error('Please fill in all required fields!');
     }
   };
 
   const handlePrevious = () => {
-    setCurrentStep(prevStep => prevStep - 1);
+    setCurrentStep(currentStep - 1);
     setValidationErrors({});
   };
 
   const handleFormChange = newData => {
-    setProductFormData(prevData => ({ ...prevData, ...newData }));
+    updateDraftData(newData);
     if (Object.keys(newData).length === 1) {
       const fieldName = Object.keys(newData)[0];
       setValidationErrors(prevErrors => {
@@ -183,7 +170,7 @@ const CreatePage = ({ isEditMode = false }) => {
       case 1:
         return (
           <ProductInfoStep
-            formData={productFormData}
+            formData={draftFormData}
             onFormChange={handleFormChange}
             onNext={handleNext}
             validationErrors={validationErrors}
@@ -193,7 +180,7 @@ const CreatePage = ({ isEditMode = false }) => {
       case 2:
         return (
           <PricingStep
-            formData={productFormData}
+            formData={draftFormData}
             onFormChange={handleFormChange}
             onNext={handleNext}
             onPrevious={handlePrevious}
@@ -204,9 +191,8 @@ const CreatePage = ({ isEditMode = false }) => {
       case 3:
         return (
           <ReviewStep
-            formData={productFormData}
+            formData={draftFormData}
             onPrevious={handlePrevious}
-            onSubmit={handleSubmit}
             setCurrentStep={setCurrentStep}
             isSubmitting={
               createProductMutation.isPending || updateProductMutation.isPending
@@ -227,14 +213,14 @@ const CreatePage = ({ isEditMode = false }) => {
       try {
         if (validateStep(1) && validateStep(2)) {
           const newProduct = {
-            ...productFormData,
-            price: parseFloat(productFormData.price),
-            stock: parseInt(productFormData.stock),
+            ...draftFormData,
+            price: parseFloat(draftFormData.price),
+            stock: parseInt(draftFormData.stock),
           };
 
-          if (isEditMode && productToEdit?._id) {
+          if (isEditMode && draftFormData?._id) {
             updateProductMutation.mutate({
-              id: productToEdit._id,
+              id: draftFormData._id,
               product: newProduct,
             });
           } else {
