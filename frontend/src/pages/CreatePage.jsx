@@ -27,7 +27,7 @@ const CreatePage = ({ isEditMode = false }) => {
   useEffect(() => {
     if (isEditMode && productToEdit) {
       updateDraftData(productToEdit);
-    } else if (!isEditMode && productToEdit) {
+    } else if (!isEditMode) {
       resetCreateForm();
     }
   }, [
