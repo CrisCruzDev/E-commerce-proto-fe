@@ -1,6 +1,10 @@
 import api from './axiosInstance';
 import { apiHandler } from './apiHandler';
 
+export const googleLogin = async accessToken => {
+  return apiHandler(() => api.post('/auth/google', { token: accessToken }));
+};
+
 export const registerUser = async userData => {
   return apiHandler(() => api.post('/auth/register', userData));
 };

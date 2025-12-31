@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useLogin } from '../../hooks/useAuth';
+import { useGoogleLoginMutation, useLogin } from '../../hooks/useAuth';
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 
 export const LoginCard = ({ userData, setUserData }) => {
   const loginMutation = useLogin({
@@ -14,6 +15,16 @@ export const LoginCard = ({ userData, setUserData }) => {
     isPending: loginMutation.isPending,
     isError: loginMutation.isError,
     isSuccess: loginMutation.isSuccess,
+  });
+
+  const googleLoginMutation = useGoogleLoginMutation();
+
+  const loginGoogle = useGoogleLogin({
+    onSuccess: tokenResponse => {
+      // Google returns an access_token here
+      googleLoginMutation.mutate(tokenResponse.access_token);
+    },
+    onError: () => console.log('Login Failed'),
   });
 
   const handleSubmit = e => {
@@ -53,8 +64,9 @@ export const LoginCard = ({ userData, setUserData }) => {
               id='email'
               value={userData.email}
               onChange={handleInput}
+              disabled={loginMutation.isPending}
               placeholder=' ' // 👈 Required for the animation to work
-              className='peer block w-full border border-black py-2 px-3 rounded-xs bg-transparent focus:outline-none focus:border-blue-500 font-sans'
+              className='peer block w-full border border-black py-2 px-3 rounded-xs bg-transparent focus:outline-none focus:border-blue-500 font-sans disabled:cursor-not-allowed'
             />
             <label
               htmlFor='email'
@@ -75,8 +87,9 @@ export const LoginCard = ({ userData, setUserData }) => {
               id='password'
               value={userData.password}
               onChange={handleInput}
+              disabled={loginMutation.isPending}
               placeholder=' '
-              className='peer block w-full border border-black py-2 px-3 rounded-xs bg-transparent focus:outline-none focus:border-blue-500 font-sans'
+              className='peer block w-full border border-black py-2 px-3 rounded-xs bg-transparent focus:outline-none focus:border-blue-500 font-sans disabled:cursor-not-allowed'
             />
             <label
               htmlFor='password'
@@ -90,7 +103,10 @@ export const LoginCard = ({ userData, setUserData }) => {
             </label>
           </div>
           <div className='w-full flex items-start justify-end -mt-2'>
-            <Link className='text-blue-500 text-xs hover:text-blue-800'>
+            <Link
+              className='text-blue-500 text-xs hover:text-blue-800 disabled:cursor-not-allowed'
+              disabled={loginMutation.isPending}
+            >
               Forgot password?
             </Link>
           </div>
@@ -98,7 +114,7 @@ export const LoginCard = ({ userData, setUserData }) => {
             <button
               type='submit'
               disabled={loginMutation.isPending}
-              className={`w-full py-3 bg-primary text-white font-medium hover:bg-[#212121] transition-colors duration-150 cursor-pointer rounded-xs ${
+              className={`w-full py-3 bg-primary text-white font-medium hover:bg-[#212121] transition-colors duration-150 cursor-pointer rounded-xs disabled:cursor-not-allowed${
                 loginMutation.isPending ? 'opacity-50' : ''
               }`}
             >
@@ -117,15 +133,18 @@ export const LoginCard = ({ userData, setUserData }) => {
         <div className='flex justify-center items-center mt-[8px]'>
           <Link
             to='/register'
-            className='text-blue-500 text-xs hover:text-blue-800'
+            className='text-blue-500 text-xs hover:text-blue-800 disabled:cursor-not-allowed'
+            disabled={loginMutation.isPending}
           >
             Register
           </Link>
         </div>
         <div className='mt-[20px] px-8'>
           <button
+            onClick={() => loginGoogle()}
             type='submit'
-            className='flex justify-center items-center space-x-2 w-full py-3 border border-black/50 font-light hover:bg-gray-100 duration-150 cursor-pointer rounded-xs'
+            disabled={loginMutation.isPending}
+            className='flex justify-center space-x-3 items-center w-full py-3 border border-gray-200 hover:bg-blue-50 hover:border-blue-100 duration-150 cursor-pointer rounded-xs disabled:cursor-not-allowed'
           >
             <div className='w-6'>
               <svg
@@ -197,7 +216,7 @@ export const LoginCard = ({ userData, setUserData }) => {
                 </g>
               </svg>
             </div>
-            <p className='font-medium'>Sign in with Google</p>
+            <p className='font-semibold'>Sign in with Google</p>
           </button>
         </div>
       </div>

@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 import {
   getMe,
+  googleLogin,
   loginUser,
   logoutUser,
   registerUser,
@@ -16,6 +17,28 @@ import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '../store/product';
+
+export const useGoogleLoginMutation = () => {
+  const { setAuth } = useAuthStore.getState();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: googleLogin,
+    onSuccess: res => {
+      setAuth({
+        user: res?.data,
+        accessToken: res?.accessToken,
+      });
+      navigate('/');
+      console.log('user google', res.data);
+      console.log('accessToken google', res.accessToken);
+    },
+    onError: error => {
+      console.error(err);
+      toast.error('Google Login failed');
+    },
+  });
+};
 
 export const useLogin = () => {
   const navigate = useNavigate();
