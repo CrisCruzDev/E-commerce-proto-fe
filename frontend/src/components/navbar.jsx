@@ -107,7 +107,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Links (Hidden on mobile) */}
-          <div className='hidden md:flex space-x-10 flex-none'>
+          <div className='hidden md:flex space-x-10 flex-none '>
             {navLinks.map(link => {
               const active = isLinkActive(link.path);
               const needsAdmin = link.adminOnly;
@@ -132,8 +132,8 @@ const Navbar = () => {
                 <button
                   key={link.name}
                   onClick={() => handleSmoothNav(link.path)}
-                  className={`relative transition-all duration-200 cursor-pointer ${
-                    active ? 'text-red-500 scale-105' : 'text-black/60'
+                  className={`relative transition-all duration-200 cursor-pointer font-mono tracking-tight ${
+                    active ? 'text-red-500 scale-105' : 'text-primary'
                   }`}
                 >
                   {link.name}

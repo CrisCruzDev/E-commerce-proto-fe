@@ -29,7 +29,7 @@ const FeaturedProducts = () => {
         <h2 className='font-bebas text-5xl md:text-7xl text-black transform scale-y-110 origin-left uppercase'>
           Featured Products
         </h2>
-        <p className='font-thin text-[10px] md:text-xl'>
+        <p className='text-[10px] md:text-xl text-gray-500 font-mono tracking-tight'>
           Get up to speed with the latest gadgets, gear, and tech on the market.
         </p>
         <div className='h-1 w-full bg-yellow mt-10 rounded-xs' />

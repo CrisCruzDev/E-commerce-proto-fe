@@ -4,6 +4,11 @@ import { getCart } from '../api/cartApi';
 import CartCard from '../components/cartPageComponents/CartCard';
 import { SummaryCard } from '../components/cartPageComponents/SummaryCard';
 import { getProductById } from '../api/productApi';
+import {
+  CartSkeleton,
+  SummarySkeleton,
+} from '../components/cartPageComponents/CartSkeleton';
+
 const CartPage = () => {
   const queryClient = useQueryClient();
 
@@ -36,6 +41,24 @@ const CartPage = () => {
   });
 
   console.log('cart: ', cartData);
+
+  if (isLoading) {
+    return (
+      <div className='container mx-auto px-4 py-8 font-bebas'>
+        <div className='flex flex-col lg:flex-row gap-8'>
+          <div className='flex-1'>
+            <div className='h-12 bg-gray-200 w-48 mb-8 rounded animate-pulse' />
+            <CartSkeleton />
+            <CartSkeleton />
+            <CartSkeleton />
+          </div>
+          <div className='lg:w-1/4'>
+            <SummarySkeleton />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isError) {
     return (
@@ -78,8 +101,13 @@ const CartPage = () => {
     <div className='container mx-auto px-4 py-8 font-bebas text-black'>
       <div className='flex flex-col lg:flex-row gap-8'>
         <div className='flex-1'>
-          <h1 className='text-5xl py-3'>Shopping Cart</h1>
-          <div className='hidden sm:grid grid-cols-4 gap-4 pb-3 px-5 text-black mt-5'>
+          <div className='flex items-end justify-between'>
+            <h1 className='text-5xl'>Shopping Cart</h1>
+            <span className='text-xl text-secondary'>
+              {cartItems.length} Items
+            </span>
+          </div>
+          <div className='hidden sm:grid grid-cols-4 gap-4 px-5 text-primary mt-5 font-mono tracking-tight'>
             <p className='col-span-2'>Item</p>
 
             <div className='flex justify-between col-span-2'>

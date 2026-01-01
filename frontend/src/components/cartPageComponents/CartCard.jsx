@@ -184,22 +184,22 @@ const CartCard = ({ item }) => {
   };
 
   return (
-    <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4 items-center py-5 px-4 sm:px-8 border border-primary/50 mt-3 rounded-xs'>
+    <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4 items-center py-5 px-4 sm:px-8 border border-gray-300 mt-3 rounded-xs font-mono tracking-tighter'>
       <div
         className='flex items-center space-x-4 col-span-2 w-full cursor-pointer'
         onClick={() => navigate(`/product/${productData?._id}`)}
       >
-        <div className='w-20 h-20 flex-shrink-0 overflow-hidden'>
+        <div className='flex-shrink-0 overflow-hidden'>
           <img
             src={productData?.image}
             alt={productData?.name}
-            className='object-cover w-full h-full'
+            className='object-contain w-30 h-25'
           />
         </div>
 
         <div className='flex-grow'>
           <p className='text-lg font-medium'>{productData?.name}</p>
-          <p className='text-xs font-light text-primary mt-1'>
+          <p className='text-xs font-light text-gray-400 mt-1'>
             {productData?._id}
           </p>
         </div>

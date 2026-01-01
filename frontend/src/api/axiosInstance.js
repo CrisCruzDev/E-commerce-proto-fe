@@ -8,9 +8,6 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-console.log('API BASE URL:', import.meta.env.VITE_API_URL);
-console.log('ENV:', import.meta.env);
-
 // 🧩 Attach token before each request
 api.interceptors.request.use(
   config => {
@@ -28,38 +25,42 @@ api.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
-    console.log('AXIOS ERROR:', error);
-    console.log('Original request:', originalRequest);
 
-    if (!error.response) {
-      return Promise.reject(error);
-    }
+    // Guard clause: if no response, just reject
+    if (!error.response) return Promise.reject(error);
 
-    // 🚫 Prevent infinite loop on the refresh-token request
+    // Guard clause: Prevent infinite loops
     if (originalRequest?.url?.includes('/auth/refresh-token')) {
       return Promise.reject(error);
     }
 
-    const { setToken, logout } = useAuthStore.getState();
-
-    // If 401 and not already retried
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 1. Check for 401 (Unauthorized)
+    if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
+        // 2. Attempt to refresh
         const res = await api.post('/auth/refresh-token');
-
         const newAccessToken = res.data?.accessToken;
-        setToken(newAccessToken);
+
+        // 3. Update Store and Headers
+        useAuthStore.getState().setToken(newAccessToken);
 
         api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
+        // 4. Retry original request
         return api(originalRequest);
       } catch (refreshErr) {
-        console.warn('Refresh token invalid, logging out.');
-        logout();
+        // 🚨 CRITICAL FIX STARTS HERE 🚨
+        console.warn('Refresh token expired. Cleaning up session...');
+
+        // A. Wipe the Zustand store (and LocalStorage via persist)
+        useAuthStore.getState().reset();
+
+        // B. Redirect to login
         window.location.href = '/login';
+
         return Promise.reject(refreshErr);
       }
     }

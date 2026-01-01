@@ -58,10 +58,10 @@ const ProductCard = ({ productData, isLoading, isError, error }) => {
           </div>
 
           <div>
-            <p className='text-xs font-thin uppercase tracking-wide'>
+            <p className='text-sm font-thin font-mono tracking-tight'>
               {productData?.brand ?? 'N/A'}
             </p>
-            <p className='text-lg font-semibold tracking-tight group-hover:text-orange-500 transition-colors duration-300 ease-in-out'>
+            <p className='text-lg font-semibold font-mono tracking-tight group-hover:text-orange-500 transition-colors duration-300 ease-in-out'>
               {productData.name}
             </p>
           </div>
@@ -69,7 +69,7 @@ const ProductCard = ({ productData, isLoading, isError, error }) => {
 
         <div className='flex flex-row justify-between items-center'>
           <div className='pt-1.5'>
-            <p className='text-md tracking-tight text-black'>
+            <p className='text-md font-mono tracking-tight text-black'>
               From {formatPrice(productData?.price)}
             </p>
           </div>
