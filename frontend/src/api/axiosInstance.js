@@ -8,6 +8,21 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 // 🧩 Attach token before each request
 api.interceptors.request.use(
   config => {
@@ -26,43 +41,43 @@ api.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
-    // Guard clause: if no response, just reject
-    if (!error.response) return Promise.reject(error);
-
-    // Guard clause: Prevent infinite loops
-    if (originalRequest?.url?.includes('/auth/refresh-token')) {
-      return Promise.reject(error);
-    }
-
-    // 1. Check for 401 (Unauthorized)
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        // 2. Attempt to refresh
-        const res = await api.post('/auth/refresh-token');
-        const newAccessToken = res.data?.accessToken;
-
-        // 3. Update Store and Headers
-        useAuthStore.getState().setToken(newAccessToken);
-
-        api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-        // 4. Retry original request
-        return api(originalRequest);
-      } catch (refreshErr) {
-        // 🚨 CRITICAL FIX STARTS HERE 🚨
-        console.warn('Refresh token expired. Cleaning up session...');
-
-        // A. Wipe the Zustand store (and LocalStorage via persist)
-        useAuthStore.getState().reset();
-
-        // B. Redirect to login
-        window.location.href = '/login';
-
-        return Promise.reject(refreshErr);
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // 🚦 If a refresh is already in progress, add this request to the queue
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(token => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch(err => Promise.reject(err));
       }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      return new Promise((resolve, reject) => {
+        api
+          .post('/auth/refresh-token')
+          .then(({ data }) => {
+            const { accessToken } = data;
+            useAuthStore.getState().setToken(accessToken);
+            api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+            processQueue(null, accessToken); // ✅ Resolve all waiting requests
+            resolve(api(originalRequest));
+          })
+          .catch(err => {
+            processQueue(err, null); // ❌ Reject all waiting requests
+            useAuthStore.getState().reset();
+            reject(err);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      });
     }
 
     return Promise.reject(error);

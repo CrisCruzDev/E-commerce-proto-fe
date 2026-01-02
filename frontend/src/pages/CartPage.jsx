@@ -13,7 +13,7 @@ const CartPage = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: cartData,
+    data: cartItems,
     isLoading,
     isError,
     error,
@@ -22,25 +22,29 @@ const CartPage = () => {
     queryFn: async () => {
       const cart = await getCart();
 
-      // Fetch each product fully and store in cache
-      await Promise.all(
+      const enrichedItems = await Promise.all(
         cart.items.map(async item => {
-          if (item?.product?._id) {
-            const fullProduct = await getProductById(item.product._id);
-            queryClient.setQueryData(
-              ['getProductById', item.product._id],
-              fullProduct
+          try {
+            const fullProduct = await getProductById(
+              item.product._id || item.product
             );
+
+            return {
+              ...item,
+              product: fullProduct,
+            };
+          } catch (err) {
+            console.error('Could not fetch product for cart item', err);
+            return null; // Handle deleted products
           }
         })
       );
-
-      return cart;
+      // 3. Filter out any nulls (deleted products)
+      return enrichedItems.filter(Boolean);
     },
-    refetchOnWindowFocus: true,
   });
 
-  console.log('cart: ', cartData);
+  console.log('cart: ', cartItems);
 
   if (isLoading) {
     return (
@@ -75,12 +79,6 @@ const CartPage = () => {
       </div>
     );
   }
-
-  const cartItems = (cartData?.items || []).filter(
-    item => item.product !== null
-  );
-
-  console.log('cartItems: ', cartItems);
 
   if (cartItems.length === 0) {
     // Check the length of the extracted cartItems array
@@ -122,7 +120,7 @@ const CartPage = () => {
         </div>
 
         <div className='lg:w-1/4'>
-          <SummaryCard item={cartItems} />
+          <SummaryCard items={cartItems} />
         </div>
       </div>
     </div>

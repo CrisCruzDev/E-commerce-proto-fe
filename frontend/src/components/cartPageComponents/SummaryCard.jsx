@@ -1,14 +1,23 @@
 import { Link } from 'react-router-dom';
 
-export const SummaryCard = ({ items = [] }) => {
-  // Safe calculation handling potential missing prices
-  const subtotal = items.reduce((acc, item) => {
-    const price = item.product?.price || 0;
-    return acc + price * item.quantity;
-  }, 0);
+export const SummaryCard = ({ items }) => {
+  const totalQuantity = items.reduce((acc, item) => acc + item.quantity, 0);
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  );
 
-  const shipping = subtotal > 0 ? subtotal * 0.008 : 0;
-  const total = subtotal + shipping;
+  const calculateShipping = qty => {
+    if (qty === 0) return 0;
+    if (qty <= 3) return 5.0; // 1-3 items
+    if (qty <= 6) return 8.0; // 4-6 items
+    if (qty <= 10) return 12.0; // 7-10 items
+    if (qty <= 15) return 18.0; // 11-15 items
+    return 25.0; // 15+ items
+  };
+
+  const shippingCost = calculateShipping(totalQuantity);
+  const orderTotal = subtotal + shippingCost;
 
   return (
     <div className='text-primary lg:sticky lg:top-24 flex flex-col gap-6 p-6 border border-black/10 bg-gray-50/30 rounded-xs'>
@@ -23,13 +32,22 @@ export const SummaryCard = ({ items = [] }) => {
         </div>
 
         <div className='flex justify-between font-mono tracking-tight'>
-          <p>Estimated Shipping</p>
-          <p className='font-medium text-black'>${shipping.toFixed(2)}</p>
+          <p>Shipping</p>
+          <p className='font-medium text-black'>${shippingCost.toFixed(2)}</p>
         </div>
+        <p className='font-mono tracking-tight text-[10px] text-gray-500 italic'>
+          {totalQuantity <= 3
+            ? 'Standard rate applied.'
+            : totalQuantity > 15
+            ? 'Heavy load handling applied.'
+            : 'Bulk shipping rate applied.'}
+        </p>
+
+        {/* Dynamic Shipping Notice */}
 
         <div className='flex justify-between text-2xl font-bebas border-t border-black/10 pt-4 mt-4'>
           <p>Total</p>
-          <p>${total.toFixed(2)}</p>
+          <p>${orderTotal.toFixed(2)}</p>
         </div>
       </div>
 
