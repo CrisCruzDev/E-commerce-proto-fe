@@ -96,7 +96,7 @@ const Navbar = () => {
       {isUser && (
         <button
           onClick={openRequestKey}
-          className='py-1 w-full bg-black text-white text-center text-sm font-medium hover:bg-black/90 transition cursor-pointer'
+          className='py-1 w-full bg-primary text-white text-center text-sm font-medium hover:bg-primary/90 transition cursor-pointer'
         >
           Switch to Admin
         </button>
@@ -142,7 +142,7 @@ const Navbar = () => {
               <div className='absolute top-full -left-20 w-[600px] bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-8 grid grid-cols-5 gap-8 translate-y-4 group-hover:translate-y-0 z-50'>
                 {/* Categories */}
                 <div className='col-span-2'>
-                  <h3 className='font-bebas text-2xl border-b-1 border-black mb-4 pb-1'>
+                  <h3 className='font-bebas text-primary text-2xl border-b-1 border-primary mb-4 pb-1'>
                     Category
                   </h3>
                   <div className='space-y-6'>
@@ -156,7 +156,7 @@ const Navbar = () => {
                             <Link
                               key={sub}
                               to={`/products?category=${sub}`}
-                              className='font-mono text-sm tracking-tight hover:text-primary hover:translate-x-1 transition-transform block text-black'
+                              className='font-mono text-sm tracking-tight hover:text-primary hover:translate-x-1 transition-transform block text-primary'
                             >
                               {sub}
                             </Link>
@@ -169,7 +169,7 @@ const Navbar = () => {
 
                 {/* Brands */}
                 <div className='col-span-3'>
-                  <h3 className='font-bebas text-2xl border-b-1 border-black mb-4 pb-1'>
+                  <h3 className='font-bebas text-primary text-2xl border-b-1 border-primary mb-4 pb-1'>
                     Brand
                   </h3>
                   <div className='grid grid-cols-3 gap-4'>
@@ -179,7 +179,7 @@ const Navbar = () => {
                           <Link
                             key={brand}
                             to={`/products?brand=${brand}`}
-                            className='font-bebas text-lg  hover:text-primary truncate block text-black'
+                            className='font-bebas text-lg  hover:text-primary truncate block text-primary'
                           >
                             {brand}
                           </Link>
@@ -208,7 +208,7 @@ const Navbar = () => {
               if (disabled) {
                 return (
                   <div key={link.name} className='relative group inline-block'>
-                    <button className='text-black/30 cursor-not-allowed font-mono tracking-tight'>
+                    <button className='text-primary cursor-not-allowed font-mono tracking-tight'>
                       {link.name}
                     </button>
                     <div className='absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block whitespace-nowrap bg-gray-900 text-white text-sm px-3 py-1 rounded-md shadow-lg z-20'>
@@ -288,7 +288,7 @@ const Navbar = () => {
 
             {/* HAMBURGER BUTTON */}
             <button
-              className='md:hidden text-black z-[70] transition-transform active:scale-90'
+              className='md:hidden text-primary z-[70] transition-transform active:scale-90'
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <HiX size={28} /> : <HiMenu size={28} />}
@@ -298,7 +298,7 @@ const Navbar = () => {
 
         {/* MOBILE DRAWER */}
         <div
-          className={`fixed inset-0 bg-black/60 z-[60] transition-opacity duration-300 md:hidden ${
+          className={`fixed inset-0 bg-primary/60 z-[60] transition-opacity duration-300 md:hidden ${
             mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
           onClick={() => setMobileOpen(false)}
@@ -321,7 +321,7 @@ const Navbar = () => {
             <div className='flex flex-col space-y-6'>
               <button
                 onClick={() => navigate('/products')}
-                className='flex items-center justify-between w-full font-bebas text-3xl text-black border-b border-primary/10 pb-2'
+                className='flex items-center justify-between w-full font-bebas text-3xl text-primary border-b border-primary/10 pb-2'
               >
                 PRODUCTS <ArrowRight size={20} className='text-secondary' />
               </button>

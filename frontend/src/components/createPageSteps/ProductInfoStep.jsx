@@ -208,7 +208,7 @@ export const ProductInfoStep = ({
         )}
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
         {/* Name Input */}
         <div>
           <label
@@ -283,27 +283,35 @@ export const ProductInfoStep = ({
         </div>
 
         {/* Category Input */}
-        <label
-          htmlFor='category'
-          className='block text-sm font-medium text-gray-700 mb-2'
-        >
-          Category
-        </label>
-        <select
-          value={formData.category}
-          onChange={handleInputChange}
-          name='category'
-          className='mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm'
-        >
-          <option value=''>Select Category</option>
-          {PRODUCT_CATEGORIES.map(category => (
-            <optgroup key={category.name} label={category.name}>
-              {category.subcategories.map(sub => (
-                <option key={sub} value={sub}></option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        <div>
+          <label
+            htmlFor='category'
+            className='block text-sm font-medium text-gray-700 mb-2'
+          >
+            Category
+          </label>
+          <select
+            value={formData.category}
+            onChange={handleInputChange}
+            name='category'
+            className='block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm'
+          >
+            <option value=''>Select Category</option>
+            {PRODUCT_CATEGORIES.map(category => (
+              <optgroup key={category.name} label={category.name}>
+                {category.subcategories.map(sub => (
+                  <option
+                    key={sub}
+                    value={sub}
+                    className='font-normal text-gray-700'
+                  >
+                    {sub}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
 
         {/* Inventory/Stock count */}
         <div>

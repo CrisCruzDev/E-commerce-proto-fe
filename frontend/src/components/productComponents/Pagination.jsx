@@ -18,10 +18,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           <button
             key={i}
             onClick={() => onPageChange(i + 1)}
-            className={`w-10 h-10 flex items-center justif-center border transition-all ${
+            className={`w-10 h-10 flex items-center justify-center border transition-all cursor-pointer ${
               currentPage === i + 1
-                ? 'bg-black text-white border-black'
-                : 'bg-white text-black border-gray-200 hover:border-black'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-primary border-gray-200 hover:border-primary'
             }`}
           >
             {i + 1}

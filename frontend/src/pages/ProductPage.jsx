@@ -200,9 +200,9 @@ const ProductsPage = () => {
         <main className='flex-1 min-h-[600px]'>
           {/* Active Filters Badges (Mobile/Desktop) */}
           {(filters.category !== 'All' || filters.brand !== 'All') && (
-            <div className='flex gap-2 mb-6 font-mono text-xs'>
+            <div className='flex gap-2 mb-6 font-mono font-semibold text-xs'>
               {filters.category !== 'All' && (
-                <span className='bg-black text-white px-3 py-1 flex items-center gap-2'>
+                <span className='border border-gray-200 text-secondary px-3 py-1 flex items-center gap-2 rounded-sm'>
                   {filters.category}
                   <button
                     onClick={() => setFilters({ ...filters, category: 'All' })}
@@ -213,7 +213,7 @@ const ProductsPage = () => {
                 </span>
               )}
               {filters.brand !== 'All' && (
-                <span className='bg-black text-white px-3 py-1 flex items-center gap-2'>
+                <span className='bg-primary text-white px-3 py-1 flex items-center gap-2 rounded-sm'>
                   {filters.brand}
                   <button
                     onClick={() => setFilters({ ...filters, brand: 'All' })}
