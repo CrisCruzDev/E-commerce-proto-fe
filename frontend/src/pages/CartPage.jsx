@@ -109,7 +109,8 @@ const CartPage = () => {
             <p className='col-span-2'>Item</p>
 
             <div className='flex justify-between col-span-2'>
-              <p>Price</p> <p>Quantity</p>
+              <p>Price</p>
+              <p>Quantity</p>
               <p>Total</p>
             </div>
           </div>

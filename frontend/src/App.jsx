@@ -7,6 +7,7 @@ import GuestRoute from './GuestRoute';
 
 import { lazy, Suspense, useEffect } from 'react';
 import { useAuthStore } from './store/auth';
+import ProductsPage from './pages/ProductPage';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CreatePage = lazy(() => import('./pages/CreatePage'));
@@ -40,6 +41,7 @@ function App() {
           />
           <Route path='/' element={<HomePage />} />
           <Route path='/product/:id' element={<ProductDetails />} />
+          <Route path='/products' element={<ProductsPage />} />
 
           {/* Protected: logged-in users only */}
           <Route

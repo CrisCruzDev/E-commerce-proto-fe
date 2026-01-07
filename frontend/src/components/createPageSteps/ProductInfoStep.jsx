@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { uploadToCloudinary } from '../../services/uploadService';
 import imageCompression from 'browser-image-compression';
+import { PRODUCT_CATEGORIES } from '../../data/constants';
 
 export const ProductInfoStep = ({
   formData,
@@ -282,23 +283,27 @@ export const ProductInfoStep = ({
         </div>
 
         {/* Category Input */}
-        <div>
-          <label
-            htmlFor='category'
-            className='block text-sm font-medium text-gray-700 mb-2'
-          >
-            Category
-          </label>
-          <input
-            type='text'
-            id='category'
-            name='category'
-            className='mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm'
-            placeholder='e.g., Electronics, Apparel'
-            value={formData.category || ''}
-            onChange={handleInputChange}
-          />
-        </div>
+        <label
+          htmlFor='category'
+          className='block text-sm font-medium text-gray-700 mb-2'
+        >
+          Category
+        </label>
+        <select
+          value={formData.category}
+          onChange={handleInputChange}
+          name='category'
+          className='mt-1 block w-full border border-gray-300 py-2 px-3 focus:outline-2 focus:outline-violet-500 sm:text-sm'
+        >
+          <option value=''>Select Category</option>
+          {PRODUCT_CATEGORIES.map(category => (
+            <optgroup key={category.name} label={category.name}>
+              {category.subcategories.map(sub => (
+                <option key={sub} value={sub}></option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
 
         {/* Inventory/Stock count */}
         <div>

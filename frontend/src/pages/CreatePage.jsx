@@ -237,7 +237,7 @@ const CreatePage = ({ isEditMode = false }) => {
   };
 
   return (
-    <div className='min-h-screen font-inter p-4 md:p-8 lg:p-12'>
+    <div className='min-h-screen font-inter p-4 md:px-12 md:p-8 lg:p-12'>
       <div className='max-w-7xl mx-auto flex flex-col lg:flex-row gap-8'>
         {/* Sidebar */}
         <nav className='lg:w-1/5 pt-4 lg:border-r border-gray-200'>

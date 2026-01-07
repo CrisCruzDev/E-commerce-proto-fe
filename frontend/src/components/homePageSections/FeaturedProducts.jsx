@@ -16,6 +16,7 @@ const FeaturedProducts = () => {
   } = useQuery({
     queryKey: ['products'],
     queryFn: () => getProducts(),
+    staleTime: 5 * 60 * 1000, // Cache for 5 mins
   });
 
   console.log('fetch all products', products);
@@ -29,7 +30,7 @@ const FeaturedProducts = () => {
         <h2 className='font-bebas text-5xl md:text-7xl text-black transform scale-y-110 origin-left uppercase'>
           Featured Products
         </h2>
-        <p className='text-[10px] md:text-xl text-gray-500 font-mono tracking-tight'>
+        <p className='flex text-center text-[10px] md:text-xl text-gray-500 font-mono tracking-tight'>
           Get up to speed with the latest gadgets, gear, and tech on the market.
         </p>
         <div className='h-1 w-full bg-yellow mt-10 rounded-xs' />
@@ -44,7 +45,7 @@ const FeaturedProducts = () => {
               .map(product => (
                 <ProductCard
                   key={product._id}
-                  productData={product}
+                  product={product}
                   isLoading={isLoading}
                   isError={isError}
                   error={error}

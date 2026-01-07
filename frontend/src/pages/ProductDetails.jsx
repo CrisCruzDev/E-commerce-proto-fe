@@ -63,7 +63,7 @@ const ProductDetails = () => {
           <div className='flex-1'>
             {user?.role === 'admin' && (
               <Link
-                className='text-[12px] cursor-pointer !text-gray-400 hover:!text-black transition-colors duration-200'
+                className='w-fit flex items-center justify-center font-mono uppercase text-[10px] cursor-pointer hover:bg-gray-100 text-gray-500 px-2 py-1 border border-gray-200 rounded-sm hover:text-black transition-colors duration-200 mb-1'
                 to={`/edit/${productId}`}
               >
                 <p>Edit product &rarr;</p>
@@ -89,7 +89,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
                 )}
-                <p className='text-gray-400 text-sm absolute bottom-4 right-4'>
+                <p className='w-fit flex items-center justify-center font-mono uppercase text-[10px] cursor-pointer hover:bg-primary hover:text-white text-primary px-2 py-1 border border-gray-300 rounded-sm transition-colors duration-200 text-sm absolute bottom-4 right-4'>
                   Click to expand
                 </p>
               </div>
@@ -97,7 +97,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Right Side: Details */}
-          <div className='flex-1 flex flex-col space-y-6'>
+          <div className='flex-1 flex flex-col space-y-6 font-mono'>
             {/* Brand, Name, and Price */}
             <div className='space-y-5'>
               <div className='text-sm text-gray-500'>{product?.brand}</div>
@@ -144,13 +144,13 @@ const ProductDetails = () => {
                 <div className='flex items-center gap-2'>
                   <label
                     htmlFor='qty'
-                    className='text-sm text-gray-600 font-thin'
+                    className='text-sm text-primary font-mono'
                   >
                     qty:
                   </label>
                   <select
                     id='qty'
-                    className={`border border-gray-300 px-6 py-2 cursor-pointer ${
+                    className={`border border-gray-300 px-6 py-2 cursor-pointer rounded-sm ${
                       isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                     value={qty}
@@ -167,7 +167,7 @@ const ProductDetails = () => {
 
                 {/* Add to cart button */}
                 <button
-                  className={`cursor-pointer flex-1 bg-black/92 text-white gap-2 h-10 hover:bg-black ${
+                  className={`cursor-pointer flex-1 bg-black/92 text-white gap-2 h-10 hover:bg-black rounded-sm font-mono ${
                     addToCartMutation.isPending
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-black/92 hover:bg-black '
@@ -215,7 +215,7 @@ const ProductDetails = () => {
 
         {/* Review Section */}
         <div className='mt-16'>
-          <h2 className='text-2xl font-bold'>Reviews</h2>
+          <h2 className='text-2xl font-bold font-mono'>Reviews</h2>
           <hr className='mt-2 border-gray-200' />
         </div>
       </div>

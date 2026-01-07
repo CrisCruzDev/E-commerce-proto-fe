@@ -5,64 +5,75 @@ import { useAddToCart } from '../../hooks/useAddToCart';
 import { useAuthStore } from '../../store/auth';
 import { formatPrice } from '../../utils/formatCurrency';
 
-const ProductCard = ({ productData, isLoading, isError, error }) => {
+const ProductCard = ({ product, isLoading, isError, error }) => {
   const setProductToEdit = useProductStore(s => s.setProductToEdit);
   const user = useAuthStore(s => s.user);
   const addToCartMutation = useAddToCart();
 
-  if (isLoading || !productData)
+  const isUncategorized = !product?.category || !product?.brand;
+
+  if (isLoading || !product)
     return <svg className='animate-spin h-10 w-10 text-white mx-auto' />;
 
   if (isError)
     return <div>Error: {error.response?.data?.message || error.message}</div>;
 
-  const currentStock = productData.stock;
+  const currentStock = product?.stock;
   const isOutOfStock = currentStock === 0;
 
   const handleEditClick = () => {
-    setProductToEdit(productData);
+    setProductToEdit(product);
   };
 
   return (
     <div>
-      {user?.role === 'admin' && (
-        <Link
-          className='text-[10px] cursor-pointer text-gray-400 hover:text-black transition-colors duration-200'
-          to={`/edit/${productData?._id}`}
-          onClick={handleEditClick}
-        >
-          <p>Edit &rarr;</p>
-        </Link>
-      )}
-      <div className='w-full group transform transition-all duration-100 ease-in-out overflow-hidden'>
-        <Link to={`/product/${productData?._id}`} state={{ productData }}>
+      <div className='flex flex-wrap items-center justify-start md:justify-between gap-2'>
+        {user?.role === 'admin' && (
+          <>
+            <Link
+              className='flex items-center justify-center font-mono font-bold uppercase text-[10px] cursor-pointer hover:bg-gray-100 text-gray-500 px-2 py-1 border border-gray-200 rounded-sm hover:text-black transition-colors duration-200'
+              to={`/edit/${product?._id}`}
+              onClick={handleEditClick}
+            >
+              <p>Edit &rarr;</p>
+            </Link>
+            {isUncategorized && (
+              <div className='ml-0  w-fit flex items-center justify-center bg-yellow/40 text-gray-500 text-[10px] font-mono font-bold uppercase px-2 py-1 rounded-sm'>
+                ❗Uncategorized
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      <div className='w-full group transform transition-all duration-100 ease-in-out overflow-hidden relative'>
+        {/* SOLD OUT overlay */}
+        {isOutOfStock && (
+          <div className='absolute inset-0 z-10 flex items-center justify-center bg-white/75 backdrop-blur-[0.5px]'>
+            <div className='py-1.5 w-full text-red-600 font-bebas text-xl text-center bg-yellow/50 shadow-xs'>
+              Out of stock
+            </div>
+          </div>
+        )}
+        <Link to={`/product/${product?._id}`} state={{ product }}>
           <div
             className={`flex relative items-center justify-center overflow-hidden w-full aspect-square transition-all duration-300 ${
-              !productData?.image ? 'bg-neutral-100' : ''
+              !product?.image ? 'bg-neutral-100' : ''
             }`}
           >
             <img
-              src={productData?.image}
-              alt={productData?.name}
+              src={product?.image}
+              alt={product?.name}
               loading='lazy'
               className='object-contain w-[80%] h-[80%] group-hover:scale-105 transition-transform duration-200'
             />
-            {/* SOLD OUT overlay */}
-            {isOutOfStock && (
-              <div className='absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px]'>
-                <div className='text-red-600 font-bebas text-xl w-[75%] text-center bg-yellow/25 shadow-xs'>
-                  Out of stock
-                </div>
-              </div>
-            )}
           </div>
 
           <div>
             <p className='text-sm font-thin font-mono tracking-tight'>
-              {productData?.brand ?? 'N/A'}
+              {product?.brand ?? 'N/A'}
             </p>
             <p className='text-lg font-semibold font-mono tracking-tight group-hover:text-orange-500 transition-colors duration-300 ease-in-out'>
-              {productData.name}
+              {product.name}
             </p>
           </div>
         </Link>
@@ -70,13 +81,13 @@ const ProductCard = ({ productData, isLoading, isError, error }) => {
         <div className='flex flex-row justify-between items-center'>
           <div className='pt-1.5'>
             <p className='text-md font-mono tracking-tight text-black'>
-              From {formatPrice(productData?.price)}
+              From {formatPrice(product?.price)}
             </p>
           </div>
           <button
             className=' h-6 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
             onClick={() =>
-              addToCartMutation.mutate({ id: productData?._id, qty: 1 })
+              addToCartMutation.mutate({ id: product?._id, qty: 1 })
             }
             disabled={isOutOfStock || addToCartMutation.isPending}
           >

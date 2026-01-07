@@ -213,7 +213,7 @@ const CartCard = ({ item }) => {
   };
 
   return (
-    <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4 items-center py-5 px-4 sm:px-8 border border-gray-300 mt-3 rounded-xs font-mono tracking-tighter'>
+    <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4 items-center py-5 px-4 sm:px-8 border border-gray-300 mt-3 rounded-sm font-mono tracking-tighter'>
       <div
         className='flex items-center space-x-4 col-span-2 w-full cursor-pointer'
         onClick={() => navigate(`/product/${item?.product?._id}`)}
@@ -242,7 +242,7 @@ const CartCard = ({ item }) => {
         <p className='hidden sm:block'>${item?.product?.price}</p>
         <div className='flex flex-col items-center sm:hidden'>
           <p className='text-sm text-gray-500'>Quantity</p>
-          <div className='w-24 flex items-center justify-between border border-primary/50'>
+          <div className='w-24 flex items-center justify-between border border-primary/50 rounded-sm'>
             <button
               className='w-full hover:bg-gray-100 cursor-pointer p-1'
               onClick={() => handleDecrement(item.product._id)}
@@ -260,7 +260,8 @@ const CartCard = ({ item }) => {
             </button>
           </div>
         </div>
-        <div className='hidden sm:flex items-center justify-center w-24 border border-primary/50'>
+
+        <div className='hidden sm:flex items-center justify-center w-24 border border-primary/50 rounded-sm'>
           <button
             className='w-full hover:bg-gray-100 cursor-pointer p-1'
             onClick={() => handleDecrement(item.product._id)}

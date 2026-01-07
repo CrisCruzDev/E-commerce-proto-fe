@@ -1,7 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import bgLogin from '../assets/login-bg.png';
+import { useLocation } from 'react-router-dom';
 import { RegisterCard } from '../components/authPage/registerForm';
 import { LoginCard } from '../components/authPage/loginForm';
 

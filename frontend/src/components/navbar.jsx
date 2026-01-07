@@ -1,14 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 
+// Store & Hooks
 import { useAuthStore } from '../store/auth';
 import { useUIStore } from '../store/ui';
+import { useLogout } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+
+// Assets/Icons
 import { LogoSvg } from './svg/LogoSvg';
 import { LoginIcon } from './svg/LoginIcon';
 import { CartIcon } from './svg/CartIcon';
-import { useLogout } from '../hooks/useAuth';
+
+// Data
+import { PRODUCT_CATEGORIES, FEATURED_BRANDS } from '../data/constants';
 
 const Navbar = () => {
   const user = useAuthStore(s => s.user);
@@ -28,12 +35,23 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Helper to chunk brands for 3 columns
+  const getBrandColumns = () => {
+    const sorted = [...FEATURED_BRANDS].sort();
+    const chunkSize = Math.ceil(sorted.length / 3);
+    return [
+      sorted.slice(0, chunkSize),
+      sorted.slice(chunkSize, chunkSize * 2),
+      sorted.slice(chunkSize * 2),
+    ];
+  };
+
   // Close mobile menu when location changes
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname, location.hash, setMobileOpen]);
 
-  // Outside click handler for desktop dropdown
+  // Outside click handler for desktop User dropdown
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -56,10 +74,8 @@ const Navbar = () => {
     navigate(path);
   };
 
-  const navLinks = [
-    { name: 'Products', path: '/#product-section', adminOnly: false },
-    { name: 'Add product', path: '/create', adminOnly: true },
-  ];
+  // 🟢 MODIFIED: Removed 'Products' from here to handle it separately with the Dropdown
+  const navLinks = [{ name: 'Add product', path: '/create', adminOnly: true }];
 
   const tooltipForAddProduct = () => {
     if (!user) return 'Log in to add products.';
@@ -107,7 +123,81 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Links (Hidden on mobile) */}
-          <div className='hidden md:flex space-x-10 flex-none '>
+          <div className='hidden md:flex space-x-10 flex-none h-full items-center'>
+            {/* PRODUCTS MEGA MENU DROPDOWN */}
+            <div className='group h-full flex items-center relative'>
+              <Link
+                to='/products'
+                className={`flex items-center gap-1 font-mono tracking-tight transition-all duration-200 cursor-pointer h-full
+                    ${
+                      location.pathname === '/products'
+                        ? 'text-red-500'
+                        : 'text-primary hover:text-red-500'
+                    }`}
+              >
+                Products <ChevronDown size={16} />
+              </Link>
+
+              {/* Dropdown Panel */}
+              <div className='absolute top-full -left-20 w-[600px] bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-8 grid grid-cols-5 gap-8 translate-y-4 group-hover:translate-y-0 z-50'>
+                {/* Categories */}
+                <div className='col-span-2'>
+                  <h3 className='font-bebas text-2xl border-b-1 border-black mb-4 pb-1'>
+                    Category
+                  </h3>
+                  <div className='space-y-6'>
+                    {PRODUCT_CATEGORIES.map(cat => (
+                      <div key={cat.name}>
+                        <p className='font-bold font-mono text-xs text-gray-400 mb-2 uppercase tracking-wide'>
+                          {cat.name}
+                        </p>
+                        <div className='flex flex-col gap-1.5 pl-2 border-l-2 border-gray-100'>
+                          {cat.subcategories.map(sub => (
+                            <Link
+                              key={sub}
+                              to={`/products?category=${sub}`}
+                              className='font-mono text-sm tracking-tight hover:text-primary hover:translate-x-1 transition-transform block text-black'
+                            >
+                              {sub}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Brands */}
+                <div className='col-span-3'>
+                  <h3 className='font-bebas text-2xl border-b-1 border-black mb-4 pb-1'>
+                    Brand
+                  </h3>
+                  <div className='grid grid-cols-3 gap-4'>
+                    {getBrandColumns().map((column, colIndex) => (
+                      <div key={colIndex} className='flex flex-col gap-1.5'>
+                        {column.map(brand => (
+                          <Link
+                            key={brand}
+                            to={`/products?brand=${brand}`}
+                            className='font-bebas text-lg  hover:text-primary truncate block text-black'
+                          >
+                            {brand}
+                          </Link>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                  <Link
+                    to='/products'
+                    className='inline-block mt-6 text-xs font-mono underline hover:text-primary text-gray-500'
+                  >
+                    VIEW ALL →
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Existing Nav Links (Add Product, etc) */}
             {navLinks.map(link => {
               const active = isLinkActive(link.path);
               const needsAdmin = link.adminOnly;
@@ -118,7 +208,7 @@ const Navbar = () => {
               if (disabled) {
                 return (
                   <div key={link.name} className='relative group inline-block'>
-                    <button className='text-black/30 cursor-not-allowed'>
+                    <button className='text-black/30 cursor-not-allowed font-mono tracking-tight'>
                       {link.name}
                     </button>
                     <div className='absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block whitespace-nowrap bg-gray-900 text-white text-sm px-3 py-1 rounded-md shadow-lg z-20'>
@@ -133,7 +223,9 @@ const Navbar = () => {
                   key={link.name}
                   onClick={() => handleSmoothNav(link.path)}
                   className={`relative transition-all duration-200 cursor-pointer font-mono tracking-tight ${
-                    active ? 'text-red-500 scale-105' : 'text-primary'
+                    active
+                      ? 'text-red-500 scale-105'
+                      : 'text-primary hover:text-red-500'
                   }`}
                 >
                   {link.name}
@@ -149,7 +241,6 @@ const Navbar = () => {
 
           {/* Right Side Icons */}
           <div className='flex-1 flex items-center justify-end space-x-6'>
-            {/* Desktop-only Auth/Cart Icons */}
             <div className='hidden md:flex items-center space-x-6'>
               {user ? (
                 <div ref={dropdownRef} className='relative'>
@@ -195,84 +286,98 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Mobile Menu Toggle */}
+            {/* HAMBURGER BUTTON */}
             <button
-              className='md:hidden text-red-500 z-50'
+              className='md:hidden text-black z-[70] transition-transform active:scale-90'
               onClick={() => setMobileOpen(!mobileOpen)}
             >
-              {mobileOpen ? <HiX size={30} /> : <HiMenu size={30} />}
+              {mobileOpen ? <HiX size={28} /> : <HiMenu size={28} />}
             </button>
           </div>
         </div>
 
-        {/* Responsive Mobile Menu */}
-        {mobileOpen && (
-          <div className='md:hidden fixed inset-0 top-0 left-0 w-full h-screen bg-black/95 backdrop-blur-md flex flex-col items-center justify-center space-y-8 z-40'>
-            {/* Mobile Nav Links */}
-            {navLinks.map(link => {
-              const active = isLinkActive(link.path);
-              const needsAdmin = link.adminOnly;
-              const disabled =
-                (needsAdmin && !isAdmin) || (!user && needsAdmin);
+        {/* MOBILE DRAWER */}
+        <div
+          className={`fixed inset-0 bg-black/60 z-[60] transition-opacity duration-300 md:hidden ${
+            mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setMobileOpen(false)}
+        />
 
-              return (
+        <aside
+          className={`fixed inset-y-0 right-0 z-[65] w-80 bg-white transform transition-transform duration-300 ease-in-out md:hidden shadow-xl flex flex-col ${
+            mobileOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          {/* Header */}
+          <div className='p-6 border-b border-primary mt-20'>
+            <h2 className='font-bebas text-4xl tracking-tight text-primary'>
+              MENU
+            </h2>
+          </div>
+
+          {/* Links */}
+          <div className='flex-1 overflow-y-auto p-8 space-y-10'>
+            <div className='flex flex-col space-y-6'>
+              <button
+                onClick={() => navigate('/products')}
+                className='flex items-center justify-between w-full font-bebas text-3xl text-black border-b border-primary/10 pb-2'
+              >
+                PRODUCTS <ArrowRight size={20} className='text-secondary' />
+              </button>
+
+              {navLinks.map(link => (
                 <button
                   key={link.name}
                   onClick={() => {
-                    if (disabled) {
+                    if (link.adminOnly && !isAdmin) {
                       toast.error(tooltipForAddProduct());
                     } else {
-                      handleSmoothNav(link.path);
-                      setMobileOpen(false);
+                      navigate(link.path);
                     }
                   }}
-                  className={`text-3xl ${
-                    disabled
-                      ? 'text-white/20'
-                      : active
-                      ? 'text-red-500 font-bold'
-                      : 'text-white'
-                  }`}
+                  className='flex items-center justify-between w-full font-bebas text-3xl text-primary border-b border-primary/10 pb-2 opacity-100'
                 >
-                  {link.name}
+                  {link.name.toUpperCase()}{' '}
+                  <ArrowRight size={20} className='text-secondary' />
                 </button>
-              );
-            })}
+              ))}
+            </div>
 
-            {/* Mobile Auth & Cart Actions */}
-            <div className='flex flex-col items-center space-y-6'>
+            {/* Small Detail Links */}
+            <div className='space-y-10 pt-4'>
               <Link
                 to='/cart'
-                onClick={() => setMobileOpen(false)}
-                className='flex items-start space-x-3 text-white text-2xl'
+                className='flex items-center gap-3 font-mono text-md uppercase tracking-wide text-primary'
               >
-                <CartIcon className='w-6 h-6 text-white' />
-                <span>Cart</span>
+                <CartIcon className='w-5 h-5' /> View Cart{' '}
+                <ArrowRight size={20} className='text-secondary' />
               </Link>
-
               {user ? (
                 <button
-                  onClick={() => {
-                    logout();
-                    setMobileOpen(false);
-                  }}
-                  className='text-red-500 text-2xl font-semibold'
+                  onClick={logout}
+                  className='flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-secondary'
                 >
-                  Logout
+                  Logout Account
                 </button>
               ) : (
                 <Link
                   to='/login'
-                  onClick={() => setMobileOpen(false)}
-                  className='flex items-center space-x-3 text-white text-2xl'
+                  className='flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-gray-500'
                 >
-                  <LoginIcon className='w-6 h-6 text-white' />
-                  <span>Login</span>
+                  <LoginIcon className='w-5 h-5' /> Account Login
                 </Link>
               )}
             </div>
           </div>
-        )}
+
+          {/* Mobile Footer */}
+          <div className='p-8 bg-gray-50'>
+            <p className='font-mono text-[10px] text-gray-400 uppercase tracking-widest text-center'>
+              ©2025 By criscruzdev
+            </p>
+          </div>
+        </aside>
       </nav>
     </>
   );
