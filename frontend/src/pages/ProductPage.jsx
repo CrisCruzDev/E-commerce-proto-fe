@@ -8,6 +8,7 @@ import FilterSidebar from '../components/productComponents/FilterSidebar';
 import Pagination from '../components/productComponents/Pagination';
 import { getProducts } from '../api/productApi';
 import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
+import ProductSkeleton from '../components/productComponents/ProductSkeleton';
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
