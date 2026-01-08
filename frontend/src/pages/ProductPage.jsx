@@ -122,11 +122,6 @@ const ProductsPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [filters.page]);
 
-  if (isLoading)
-    return (
-      <div className='animate-spin h-10 w-10 border-4 border-gray-300 border-t-red-500 rounded-full'></div>
-    );
-
   return (
     <div className='container mx-auto md:px-12 px-4 py-8 max-w-7xl'>
       {/* TOP BAR */}
@@ -229,7 +224,13 @@ const ProductsPage = () => {
             </div>
           )}
 
-          {currentProducts.length > 0 ? (
+          {isLoading ? (
+            <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 lg:gap-8'>
+              {[...Array(filters.limit)].map((_, i) => (
+                <ProductSkeleton key={i} />
+              ))}
+            </div>
+          ) : currentProducts.length > 0 ? (
             <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 lg:gap-8'>
               {currentProducts.map(product => (
                 <ProductCard key={product._id} product={product} />
