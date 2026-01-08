@@ -64,7 +64,7 @@ const ProductCard = ({ product, isLoading, isError, error }) => {
               src={product?.image}
               alt={product?.name}
               loading='lazy'
-              className='object-contain w-[80%] h-[80%] group-hover:scale-105 transition-transform duration-200'
+              className='object-contain w-[80%] h-[80%] group-hover:scale-105 transition-transform duration-200 '
             />
           </div>
 

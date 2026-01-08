@@ -60,7 +60,7 @@ const ProductDetails = () => {
         {/* Product Section */}
         <div className='flex flex-col md:flex-row gap-8 md:gap-16'>
           {/* Left Side: Image */}
-          <div>
+          <div className='w-full md:w-1/2 aspect-squre'>
             {user?.role === 'admin' && (
               <Link
                 className='w-fit flex items-center justify-center font-mono uppercase text-[10px] cursor-pointer hover:bg-gray-100 text-gray-500 px-2 py-1 border border-gray-200 rounded-sm hover:text-black transition-colors duration-200 mb-1'
@@ -69,31 +69,32 @@ const ProductDetails = () => {
                 <p>Edit product &rarr;</p>
               </Link>
             )}
-
-            <button
-              className='cursor-pointer'
-              onClick={() => setIsExpanded(true)}
-              disabled={isOutOfStock}
-            >
-              <div className='relative w-full h-120 sm:h-full bg-gray-100 overflow-hidden flex items-center justify-center p-25'>
-                <img
-                  src={product?.image}
-                  alt='Product'
-                  className='object-contain h-full'
-                />
-                {/* SOLD OUT overlay */}
-                {isOutOfStock && (
-                  <div className='absolute inset-0 flex items-center justify-center z-10 bg-white/50 backdrop-blur-[1px]'>
-                    <div className='text-red-600 font-bebas text-xl w-[75%] text-center bg-yellow/25 shadow-xs'>
-                      Out of stock
+            <div className='w-full bg-gray-100 overflow-hidden flex items-center justify-center relative'>
+              <button
+                className='cursor-pointer'
+                onClick={() => setIsExpanded(true)}
+                disabled={isOutOfStock}
+              >
+                <div className='relative w-full sm:h-full p-18'>
+                  <img
+                    src={product?.image}
+                    alt='Product'
+                    className='object-contain'
+                  />
+                  {/* SOLD OUT overlay */}
+                  {isOutOfStock && (
+                    <div className='absolute inset-0 flex items-center justify-center z-10 bg-white/50 backdrop-blur-[1px]'>
+                      <div className='text-red-600 font-bebas text-xl w-[75%] text-center bg-yellow/25 shadow-xs'>
+                        Out of stock
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
                 <p className='w-fit flex items-center justify-center font-mono uppercase text-[10px] cursor-pointer hover:bg-primary hover:text-white text-primary px-2 py-1 border border-gray-300 rounded-sm transition-colors duration-200 text-sm absolute bottom-4 right-4'>
                   Click to expand
                 </p>
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
 
           {/* Right Side: Details */}
@@ -115,7 +116,7 @@ const ProductDetails = () => {
               <div className='text-sm text-gray-500 mb-2'>
                 Product Description:
               </div>
-              <p className='whitespace-pre-line mt-2 text-black'>
+              <p className='text-sm whitespace-pre-line mt-2 text-primary'>
                 {product?.description || 'N/A'}
               </p>
             </div>
@@ -133,7 +134,7 @@ const ProductDetails = () => {
               {currentStock > 0
                 ? currentStock < 6
                   ? `Only ${''} ${currentStock} ${''} left !`
-                  : `${currentStock} ${''} left`
+                  : 'In stock'
                 : 'Out of stock'}
             </div>
 

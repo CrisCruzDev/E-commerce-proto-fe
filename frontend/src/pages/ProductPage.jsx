@@ -7,10 +7,14 @@ import ProductCard from '../components/productComponents/ProductCard';
 import FilterSidebar from '../components/productComponents/FilterSidebar';
 import Pagination from '../components/productComponents/Pagination';
 import { getProducts } from '../api/productApi';
+import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  //Lock scrolling when filter is open
+  useLockBodyScroll(isFilterOpen);
 
   // 1. Initial State derived from URL
   const [filters, setFilters] = useState({

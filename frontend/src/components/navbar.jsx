@@ -1,13 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
-import {
-  ArrowRight,
-  ChevronDown,
-  LogIn,
-  LogInIcon,
-  ShoppingCart,
-} from 'lucide-react';
+import { ArrowRight, ChevronDown, LogIn, ShoppingCart } from 'lucide-react';
 
 // Store & Hooks
 import { useAuthStore } from '../store/auth';
@@ -17,11 +11,10 @@ import toast from 'react-hot-toast';
 
 // Assets/Icons
 import { LogoSvg } from './svg/LogoSvg';
-import { LoginIcon } from './svg/LoginIcon';
-import { CartIcon } from './svg/CartIcon';
 
 // Data
 import { PRODUCT_CATEGORIES, FEATURED_BRANDS } from '../data/constants';
+import { useLockBodyScroll } from '../hooks/useLockBodyScroll';
 
 const Navbar = () => {
   const user = useAuthStore(s => s.user);
@@ -51,6 +44,9 @@ const Navbar = () => {
       sorted.slice(chunkSize * 2),
     ];
   };
+
+  // Lock scrolling effect when menu is open
+  useLockBodyScroll(mobileOpen);
 
   // Close mobile menu when location changes
   useEffect(() => {
