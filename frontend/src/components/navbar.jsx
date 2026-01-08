@@ -208,7 +208,7 @@ const Navbar = () => {
               if (disabled) {
                 return (
                   <div key={link.name} className='relative group inline-block'>
-                    <button className='text-primary cursor-not-allowed font-mono tracking-tight'>
+                    <button className='text-primary/20 cursor-not-allowed font-mono tracking-tight'>
                       {link.name}
                     </button>
                     <div className='absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block whitespace-nowrap bg-gray-900 text-white text-sm px-3 py-1 rounded-md shadow-lg z-20'>
