@@ -60,7 +60,7 @@ const ProductDetails = () => {
         {/* Product Section */}
         <div className='flex flex-col md:flex-row gap-8 md:gap-16'>
           {/* Left Side: Image */}
-          <div className='flex-1'>
+          <div>
             {user?.role === 'admin' && (
               <Link
                 className='w-fit flex items-center justify-center font-mono uppercase text-[10px] cursor-pointer hover:bg-gray-100 text-gray-500 px-2 py-1 border border-gray-200 rounded-sm hover:text-black transition-colors duration-200 mb-1'

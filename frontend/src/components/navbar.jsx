@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronDown,
+  LogIn,
+  LogInIcon,
+  ShoppingCart,
+} from 'lucide-react';
 
 // Store & Hooks
 import { useAuthStore } from '../store/auth';
@@ -248,7 +254,7 @@ const Navbar = () => {
                     onClick={() => setDropdownOpen(prev => !prev)}
                     className='flex items-center cursor-pointer'
                   >
-                    <LoginIcon className='w-5 h-5' />
+                    <LogIn className='w-5 h-5' />
                   </button>
                   {dropdownOpen && (
                     <div className='absolute right-0 mt-3 w-40 bg-white shadow-lg border border-gray-200 rounded-xs z-50 origin-top-right animate-dropdownFadeScale'>
@@ -271,12 +277,12 @@ const Navbar = () => {
                 </div>
               ) : (
                 <Link to='/login'>
-                  <LoginIcon className='w-5 h-5 cursor-pointer' />
+                  <LogIn className='w-5 h-5 cursor-pointer' />
                 </Link>
               )}
 
               <Link to='/cart'>
-                <CartIcon
+                <ShoppingCart
                   className={`w-5 h-5 ${
                     location.pathname === '/cart'
                       ? 'text-red-500'
@@ -350,7 +356,7 @@ const Navbar = () => {
                 to='/cart'
                 className='flex items-center gap-3 font-mono text-md uppercase tracking-wide text-primary'
               >
-                <CartIcon className='w-5 h-5' /> View Cart{' '}
+                <ShoppingCart className='w-5 h-5' /> View Cart{' '}
                 <ArrowRight size={20} className='text-secondary' />
               </Link>
               {user ? (
@@ -365,7 +371,7 @@ const Navbar = () => {
                   to='/login'
                   className='flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-gray-500'
                 >
-                  <LoginIcon className='w-5 h-5' /> Account Login
+                  <LogIn className='w-5 h-5' /> Account Login
                 </Link>
               )}
             </div>
