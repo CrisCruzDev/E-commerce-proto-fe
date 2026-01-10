@@ -12,6 +12,7 @@ import SuccessPage from './pages/SuccessPage';
 import CheckoutPage from './pages/CheckoutPage';
 import { Elements } from '@stripe/react-stripe-js';
 import { stripePromise } from './lib/stripe';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CreatePage = lazy(() => import('./pages/CreatePage'));
@@ -71,6 +72,14 @@ function App() {
                 <Elements stripe={stripePromise}>
                   <CheckoutPage />
                 </Elements>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/orders'
+            element={
+              <ProtectedRoute>
+                <OrderHistoryPage />
               </ProtectedRoute>
             }
           />

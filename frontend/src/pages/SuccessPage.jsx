@@ -17,7 +17,7 @@ const SuccessPage = () => {
 
       <p className='max-w-md text-gray-500 text-sm mb-10'>
         Your transaction was successful. We have sent a receipt to your email
-        address. Your items will be shipped shortly (Demo).
+        address. Thank you for trying out cris-store! (Demo).
       </p>
 
       <div className='flex flex-col md:flex-row gap-4 w-full max-w-sm'>
@@ -28,7 +28,7 @@ const SuccessPage = () => {
           Continue Shopping
         </Link>
         <Link
-          to='/profile/orders'
+          to='/orders'
           className='flex-1 bg-black text-white py-4 font-bold hover:bg-zinc-800 transition-all text-sm'
         >
           View my Orders

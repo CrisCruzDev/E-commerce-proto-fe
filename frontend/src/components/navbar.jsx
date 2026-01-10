@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { ArrowRight, ChevronDown, LogIn, ShoppingCart } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronDown,
+  LogIn,
+  LogOut,
+  ShoppingBag,
+  ShoppingCart,
+  User,
+} from 'lucide-react';
 
 // Store & Hooks
 import { useAuthStore } from '../store/auth';
@@ -141,7 +149,7 @@ const Navbar = () => {
               </Link>
 
               {/* Dropdown Panel */}
-              <div className='absolute top-full -left-20 w-[600px] bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-8 grid grid-cols-5 gap-8 translate-y-4 group-hover:translate-y-0 z-50'>
+              <div className='absolute top-full -left-20 w-[600px] bg-white border border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-8 grid grid-cols-5 gap-8 translate-y-4 group-hover:translate-y-0 z-50'>
                 {/* Categories */}
                 <div className='col-span-2'>
                   <h3 className='font-bebas text-primary text-2xl border-b-1 border-primary mb-4 pb-1'>
@@ -245,28 +253,43 @@ const Navbar = () => {
           <div className='flex-1 flex items-center justify-end space-x-6'>
             <div className='hidden md:flex items-center space-x-6'>
               {user ? (
-                <div ref={dropdownRef} className='relative'>
+                <div className='relative' ref={dropdownRef}>
                   <button
-                    onClick={() => setDropdownOpen(prev => !prev)}
-                    className='flex items-center cursor-pointer'
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className='flex items-center gap-0 hover:opacity-70 transition-opacity cursor-pointer'
                   >
-                    <LogIn className='w-5 h-5' />
+                    <User size={24} className='text-black' />{' '}
+                    <ChevronDown size={18} />
+                    <span className='font-bebas text-lg hidden md:block uppercase'>
+                      {user.name?.split(' ')[0]}
+                    </span>
                   </button>
+
+                  {/* Dropdown Menu */}
                   {dropdownOpen && (
-                    <div className='absolute right-0 mt-3 w-40 bg-white shadow-lg border border-gray-200 rounded-xs z-50 origin-top-right animate-dropdownFadeScale'>
+                    <div className='absolute right-0 top-10 w-48 bg-white border border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50'>
+                      <Link
+                        to='/orders'
+                        onClick={() => setDropdownOpen(false)}
+                        className='flex items-center gap-3 px-4 py-3 hover:bg-gray-100 border-b border-gray-100 transition-colors'
+                      >
+                        <ShoppingBag size={16} />
+                        <span className='font-mono text-xs uppercase font-bold'>
+                          View Orders
+                        </span>
+                      </Link>
+
                       <button
                         onClick={() => {
-                          setDropdownOpen(false);
                           logout();
+                          setDropdownOpen(false);
                         }}
-                        disabled={isLoggingOut}
-                        className={`w-full text-left px-4 py-2 text-sm transition-opacity duration-200 cursor-pointer ${
-                          isLoggingOut
-                            ? 'opacity-40 pointer-events-none'
-                            : 'hover:bg-gray-100'
-                        }`}
+                        className='w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 transition-colors text-left'
                       >
-                        Logout
+                        <LogOut size={16} />
+                        <span className='font-mono text-xs uppercase font-bold'>
+                          Logout
+                        </span>
                       </button>
                     </div>
                   )}
@@ -327,6 +350,16 @@ const Navbar = () => {
               >
                 PRODUCTS <ArrowRight size={20} className='text-secondary' />
               </button>
+              {/* VIEW ORDERS LINK (MOBILE) */}
+              {user && (
+                <button
+                  onClick={() => navigate('/orders')}
+                  className='flex items-center justify-between w-full font-bebas text-3xl text-primary border-b border-primary/10 pb-2'
+                >
+                  VIEW ORDERS{' '}
+                  <ArrowRight size={20} className='text-secondary' />
+                </button>
+              )}
 
               {navLinks.map(link => (
                 <button

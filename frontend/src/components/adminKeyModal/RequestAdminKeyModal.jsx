@@ -31,7 +31,7 @@ const RequestAdminKeyModal = ({ isOpen, onClose }) => {
 
   return (
     <div className='fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50'>
-      <div className='bg-white rounded-lg p-6 w-[90%] max-w-md shadow-lg'>
+      <div className='bg-white border border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] p-6 w-[90%] max-w-md'>
         <h2 className='text-xl font-semibold mb-3'>Request Admin Key</h2>
         <p className='text-gray-600'>
           We will send an admin verification key to:

@@ -33,7 +33,7 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
 
   return (
     <div className='fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50'>
-      <div className='bg-white rounded-xl p-6 w-[90%] max-w-md shadow-xl border border-gray-200 animate-fadeIn'>
+      <div className='bg-white p-6 w-[90%] max-w-md border border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-fadeIn'>
         {/* Success Notice */}
         <div className='flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-5'>
           <svg

@@ -124,7 +124,7 @@ const CartCard = ({ item }) => {
 
       {isConfirmModalOpen && (
         <div className='fixed inset-0 bg-black/30 backdrop-blur-[5px] overflow-y-auto h-full w-full flex items-center justify-center z-50'>
-          <div className='bg-white p-6 shadow-xl max-w-sm w-full'>
+          <div className='bg-white border border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 max-w-sm w-full'>
             <h3 className='text-lg font-bold mb-4'>Remove Item</h3>
             <p className='mb-6 text-gray-700'>
               Are you sure you want to remove this item from your cart?
