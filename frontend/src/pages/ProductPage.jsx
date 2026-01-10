@@ -26,7 +26,7 @@ const ProductsPage = () => {
     limit: 9,
   });
 
-  // 2. Fetch Data
+  // Fetch Data
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: getProducts,
@@ -34,7 +34,7 @@ const ProductsPage = () => {
   });
   console.log('products in page', products);
 
-  // 3. 🧠 DERIVE BRANDS: Extract unique brands from actual products
+  // DERIVE BRANDS: Extract unique brands from actual products
   const availableBrands = useMemo(() => {
     if (!Array.isArray(products)) return [];
 
@@ -49,7 +49,7 @@ const ProductsPage = () => {
       .sort((a, b) => a.localeCompare(b)); // Better sorting
   }, [products]);
 
-  // 4. Sync URL with State (When Navbar is clicked)
+  // Sync URL with State (When Navbar is clicked)
   useEffect(() => {
     const cat = searchParams.get('category');
     const brand = searchParams.get('brand');
@@ -68,7 +68,7 @@ const ProductsPage = () => {
     }
   }, [searchParams]);
 
-  // 5. Update URL when Filters Change (Optional but good UX)
+  // Update URL when Filters Change
   // This allows users to share the URL with current filters
   useEffect(() => {
     const params = {};
@@ -77,17 +77,17 @@ const ProductsPage = () => {
     setSearchParams(params);
   }, [filters.category, filters.brand]);
 
-  // 6. Filter Logic
+  // Filter Logic
   const filteredProducts = useMemo(() => {
-    // 1. Safety Check: If API returns weird data, return empty array
+    // Safety Check: If API returns weird data, return empty array
     if (!Array.isArray(products)) return [];
 
     return products.filter(product => {
-      // A. Safe Search (Handle missing name)
+      // Safe Search (Handle missing name)
       const name = product.name?.toLowerCase() || '';
       const matchesSearch = name.includes(filters.search.toLowerCase());
 
-      // B. Safe Category Check
+      // Safe Category Check
       // If category is missing, we treat it as "uncategorized" internally
       const productCat = product.category?.toLowerCase() || 'uncategorized';
       const filterCat = filters.category.toLowerCase();
@@ -97,7 +97,7 @@ const ProductsPage = () => {
       const matchesCategory =
         filters.category === 'All' || productCat === filterCat;
 
-      // C. Safe Brand Check
+      // Safe Brand Check
       const productBrand = product.brand?.toLowerCase() || 'uncategorized';
       const filterBrand = filters.brand.toLowerCase();
       const matchesBrand =
@@ -107,7 +107,7 @@ const ProductsPage = () => {
     });
   }, [products, filters]);
 
-  // 7. Pagination Logic
+  // Pagination Logic
   const totalItems = filteredProducts.length;
   const totalPages = Math.ceil(totalItems / filters.limit);
   const startIndex = (filters.page - 1) * filters.limit;

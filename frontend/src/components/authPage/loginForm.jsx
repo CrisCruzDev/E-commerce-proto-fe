@@ -139,6 +139,7 @@ export const LoginCard = ({ userData, setUserData }) => {
             Register
           </Link>
         </div>
+
         <div className='mt-[20px] px-8'>
           <button
             onClick={() => loginGoogle()}

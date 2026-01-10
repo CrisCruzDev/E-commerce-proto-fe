@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useProductStore } from '../../store/product';
-import { useAddToCart } from '../../hooks/useAddToCart';
+import { useAddToCart } from '../../hooks/useCartHooks';
 import { useAuthStore } from '../../store/auth';
 import { formatPrice } from '../../utils/formatCurrency';
 

@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAddToCart } from '../hooks/useAddToCart';
+import { useAddToCart } from '../hooks/useCartHooks';
 import { useCartStore } from '../store/cart';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';

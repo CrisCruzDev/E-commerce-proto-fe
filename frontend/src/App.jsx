@@ -8,6 +8,10 @@ import GuestRoute from './GuestRoute';
 import { lazy, Suspense, useEffect } from 'react';
 import { useAuthStore } from './store/auth';
 import ProductsPage from './pages/ProductPage';
+import SuccessPage from './pages/SuccessPage';
+import CheckoutPage from './pages/CheckoutPage';
+import { Elements } from '@stripe/react-stripe-js';
+import { stripePromise } from './lib/stripe';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CreatePage = lazy(() => import('./pages/CreatePage'));
@@ -49,6 +53,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <CartPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/success'
+            element={
+              <ProtectedRoute>
+                <SuccessPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/checkout'
+            element={
+              <ProtectedRoute>
+                <Elements stripe={stripePromise}>
+                  <CheckoutPage />
+                </Elements>
               </ProtectedRoute>
             }
           />

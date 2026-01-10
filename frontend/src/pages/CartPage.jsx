@@ -1,48 +1,13 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { getCart } from '../api/cartApi';
 import CartCard from '../components/cartPageComponents/CartCard';
 import { SummaryCard } from '../components/cartPageComponents/SummaryCard';
-import { getProductById } from '../api/productApi';
-import {
-  CartSkeleton,
-  SummarySkeleton,
-} from '../components/cartPageComponents/CartSkeleton';
+
+import { useGetCart } from '../hooks/useCartHooks';
+import SummarySkeleton from '../components/cartPageComponents/SummarySkeleton';
+import CartSkeleton from '../components/cartPageComponents/CartSkeleton';
 
 const CartPage = () => {
-  const queryClient = useQueryClient();
-
-  const {
-    data: cartItems,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['cart'],
-    queryFn: async () => {
-      const cart = await getCart();
-
-      const enrichedItems = await Promise.all(
-        cart.items.map(async item => {
-          try {
-            const fullProduct = await getProductById(
-              item.product._id || item.product
-            );
-
-            return {
-              ...item,
-              product: fullProduct,
-            };
-          } catch (err) {
-            console.error('Could not fetch product for cart item', err);
-            return null; // Handle deleted products
-          }
-        })
-      );
-      // 3. Filter out any nulls (deleted products)
-      return enrichedItems.filter(Boolean);
-    },
-  });
+  const { data: cartItems, isLoading, isError, error } = useGetCart();
 
   console.log('cart: ', cartItems);
 
