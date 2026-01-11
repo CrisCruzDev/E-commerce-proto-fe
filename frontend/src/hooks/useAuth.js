@@ -144,12 +144,15 @@ export const useVerifyAdminKey = () => {
   const queryClient = useQueryClient();
 
   const setToken = useAuthStore(s => s.setToken);
+  const setUser = useAuthStore(s => s.setUser);
 
   return useMutation({
     mutationFn: verifyAdminKey,
     onSuccess: res => {
       console.log('ADMIN KEY VERIFIED:', res);
       setToken(res.accessToken);
+      const currentUser = useAuthStore.getState().user;
+      setUser({ ...currentUser, role: 'admin' });
       toast.success(res.message || 'Admin privileges granted');
     },
     onError: err => {

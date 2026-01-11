@@ -61,6 +61,9 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
         </p>
         <p className='text-sm mb-4 font-medium'>
           Enter the key below to confirm your admin status:
+          <span className='text-secondary block text-[10px] uppercase mt-1 tracking-wider font-mono'>
+            Key expires in 10 minutes.
+          </span>
         </p>
 
         {/* Input */}
