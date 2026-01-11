@@ -50,7 +50,7 @@ const OrderHistoryPage = () => {
         </div>
       ) : (
         <div className='space-y-8'>
-          {orders.map(order => (
+          {orders?.map(order => (
             <OrderCard key={order._id} order={order} />
           ))}
         </div>

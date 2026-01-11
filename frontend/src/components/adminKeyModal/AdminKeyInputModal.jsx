@@ -11,6 +11,13 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  const devEmail = 'criscrosscruz@gmail.com';
+
+  const copyDevEmail = () => {
+    navigator.clipboard.writeText(devEmail);
+    toast.success('Email copied to clipboard!');
+  };
+
   const handleVerify = () => {
     if (!keyInput.trim()) {
       toast.error('Please enter the admin key.');
@@ -34,6 +41,21 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
   return (
     <div className='fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50'>
       <div className='bg-white p-6 w-[90%] max-w-md border border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-fadeIn'>
+        {/* DEMO MODE NOTICE */}
+        <div className='bg-amber-50 border font-mono border-amber-200 p-3 mb-4 text-[11px] leading-tight text-amber-800 uppercase tracking-tighter'>
+          <p className='font-bold mb-1'>⚠️ Portfolio Demo Mode:</p>
+          <p>
+            Email delivery is restricted. The admin key has been redirected to
+            the <strong>Developer's Inbox</strong>.
+          </p>
+          <button
+            onClick={copyDevEmail}
+            className='w-full py-2 bg-amber-500/10 border border-amber-500/40 text-amber-900 text-[10px] font-bold uppercase hover:bg-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2'
+          >
+            Copy Dev Email to ask for Key
+          </button>
+        </div>
+
         {/* Success Notice */}
         <div className='flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-5'>
           <svg
@@ -56,11 +78,12 @@ const AdminKeyInputModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Title */}
-        <p className='text-gray-600 mb-6'>
-          A verification key was sent to: {user?.email}
+        <p className='text-gray-600 mb-6 text-sm'>
+          Verification key targeted to:{' '}
+          <span className='font-bold'>{user?.email}</span>
         </p>
         <p className='text-sm mb-4 font-medium'>
-          Enter the key below to confirm your admin status:
+          Enter the key below:
           <span className='text-secondary block text-[10px] uppercase mt-1 tracking-wider font-mono'>
             Key expires in 10 minutes.
           </span>

@@ -150,9 +150,14 @@ export const useVerifyAdminKey = () => {
     mutationFn: verifyAdminKey,
     onSuccess: res => {
       console.log('ADMIN KEY VERIFIED:', res);
+
       setToken(res.accessToken);
+
       const currentUser = useAuthStore.getState().user;
       setUser({ ...currentUser, role: 'admin' });
+
+      queryClient.invalidateQueries();
+
       toast.success(res.message || 'Admin privileges granted');
     },
     onError: err => {
@@ -163,6 +168,7 @@ export const useVerifyAdminKey = () => {
     },
   });
 };
+
 export const useLogout = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
